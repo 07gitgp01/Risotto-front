@@ -5,6 +5,12 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Firebase config is per developer/environment and never committed: without it the
+// app builds and runs with push notifications disabled.
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+}
+
 android {
     namespace = "com.risotto.risotto"
     compileSdk = flutter.compileSdkVersion
