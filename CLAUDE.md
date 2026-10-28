@@ -57,15 +57,16 @@ flutter build apk --debug
 - Riverpod 3 : `Provider` / `FutureProvider` / `Notifier` ; tests via `ProviderScope(overrides: [...overrideWithValue(fake)])`.
 - Auth : `AuthController` (`AuthUnknown` → `Authenticated` / `Unauthenticated`) ; la session (tokens + user) est un seul JSON dans flutter_secure_storage (`SessionStorage`). Au démarrage, une session stockée ouvre l'accueil même hors ligne.
 - `AuthInterceptor` : bearer automatique, refresh unique partagé sur 401 puis rejeu de la requête ; refresh refusé ⇒ purge + `onSessionExpired()`. Les appels publics passent `extra: {skipAuthKey: true}`.
-- Redirections : `authRedirect()` pur dans `core/router/app_router.dart`, routes publiques dans `AppRoutes.publicRoutes`.
+- Redirections : `appRedirect(auth, profileStatus, location)` pur dans `core/router/app_router.dart` ; sans profil ⇒ `/profile/setup` ; statut `unknown` (chargement, hors ligne) ⇒ jamais bloquant. Routes publiques dans `AppRoutes.publicRoutes`.
+- Profil : `myProfileProvider` (AsyncNotifier, `null` = à créer, rechargé à chaque changement d'auth) ; photos téléchargées via dio authentifié (`profilePhotoProvider`, clé = URL versionnée) puis `MemoryImage`. Sélection d'image derrière `PhotoPicker` (fake en test).
 - Erreurs API : `ApiException` (`guardApi`) avec message français générique ; chaque écran précise le message selon `kind`.
-- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, health:)`, `enterField`, `tapText` (fait défiler avant de taper) dans `test/helpers/`.
+- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, health:, profiles:, photoPicker:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
 - Faux HTTP pour tester les repositories : `test/helpers/fake_http_adapter.dart`.
 
 ## Jalons
 - [x] 1. Fondations (structure, CI, configuration, thème Risotto)
 - [x] 2. Authentification (écrans inscription, connexion, mot de passe oublié, refresh, déconnexion)
-- [ ] 3. Profil (création, édition, photo, visibilité)
+- [x] 3. Profil (création, édition, photo, visibilité)
 - [ ] 4. Contacts et partage (carte de contact, QR code personnel, scan)
 - [ ] 5. Mise en relation (recherche, demande, acceptation/refus, blocage)
 - [ ] 6. Messagerie (WebSocket, historique paginé, accusés de lecture)
