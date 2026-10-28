@@ -38,6 +38,19 @@ final memberSearchProvider = FutureProvider.autoDispose
       return ref.watch(connectionsRepositoryProvider).search(trimmed);
     });
 
+/// Incremented after every connection action, so summaries elsewhere (dashboard)
+/// can refresh without depending on the lists themselves.
+class NetworkRevision extends Notifier<int> {
+  @override
+  int build() => 0;
+
+  void bump() => state++;
+}
+
+final networkRevisionProvider = NotifierProvider<NetworkRevision, int>(
+  NetworkRevision.new,
+);
+
 /// Connection actions; each one refreshes every list that may have changed.
 class ConnectionActions {
   ConnectionActions(this._ref);
@@ -52,6 +65,7 @@ class ConnectionActions {
       ..invalidate(myConnectionsProvider)
       ..invalidate(connectionRequestsProvider)
       ..invalidate(memberSearchProvider);
+    _ref.read(networkRevisionProvider.notifier).bump();
     if (userId != null) {
       _ref.invalidate(profileByIdProvider(userId));
     }
