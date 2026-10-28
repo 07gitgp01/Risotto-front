@@ -18,6 +18,29 @@ enum ProfileVisibility {
       .firstWhere((v) => v.name == name, orElse: () => connections);
 }
 
+/// Connection between the current user and another member.
+enum ConnectionStatus { none, pendingOutgoing, pendingIncoming, connected }
+
+class MemberConnection {
+  const MemberConnection(this.status, [this.connectionId]);
+
+  factory MemberConnection.fromJson(Map<String, dynamic>? json) {
+    if (json == null) {
+      return const MemberConnection(ConnectionStatus.none);
+    }
+    final status = switch (json['status']) {
+      'pending_outgoing' => ConnectionStatus.pendingOutgoing,
+      'pending_incoming' => ConnectionStatus.pendingIncoming,
+      'connected' => ConnectionStatus.connected,
+      _ => ConnectionStatus.none,
+    };
+    return MemberConnection(status, json['connectionId'] as String?);
+  }
+
+  final ConnectionStatus status;
+  final String? connectionId;
+}
+
 /// How much of a profile the API returned (depends on visibility and relationship).
 enum ProfileAccess { full, preview, minimal }
 
@@ -42,6 +65,7 @@ class Profile {
     this.shareEmail,
     this.sharePhone,
     this.accountEmail,
+    this.connection,
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) => Profile(
@@ -67,6 +91,9 @@ class Profile {
     shareEmail: json['shareEmail'] as bool?,
     sharePhone: json['sharePhone'] as bool?,
     accountEmail: json['accountEmail'] as String?,
+    connection: json.containsKey('connection')
+        ? MemberConnection.fromJson(json['connection'] as Map<String, dynamic>?)
+        : null,
   );
 
   final String userId;
@@ -86,6 +113,9 @@ class Profile {
   final bool? shareEmail;
   final bool? sharePhone;
   final String? accountEmail;
+
+  /// Only on other members' profiles and search results.
+  final MemberConnection? connection;
 
   bool get isOwn => visibility != null;
 
