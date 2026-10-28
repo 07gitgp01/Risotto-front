@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../../../core/storage/session_storage.dart';
+import '../../notifications/application/push_registration.dart';
 import '../data/auth_models.dart';
 import '../data/auth_repository.dart';
 
@@ -85,6 +86,12 @@ class AuthController extends Notifier<AuthState> {
   Future<void> logout() async {
     final session = await _storage.read();
     if (session != null) {
+      // While still authenticated: unregister this device from push.
+      try {
+        await ref.read(pushRegistrationProvider).onSigningOut();
+      } on Object {
+        // Never block the sign-out.
+      }
       try {
         await _repository.logout(session.tokens.refreshToken);
       } on ApiException {

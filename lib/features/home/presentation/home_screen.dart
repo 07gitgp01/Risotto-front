@@ -6,6 +6,7 @@ import '../../../core/network/api_health_repository.dart';
 import '../../../core/router/app_routes.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../messaging/application/messaging_providers.dart';
+import '../../notifications/application/notifications_providers.dart';
 import '../../profile/application/my_profile_controller.dart';
 import '../../profile/presentation/widgets/profile_avatar.dart';
 
@@ -22,11 +23,25 @@ class HomeScreen extends ConsumerWidget {
     final email = auth is Authenticated ? auth.user.email : '';
     final profile = ref.watch(myProfileProvider).value;
     final unreadMessages = ref.watch(unreadMessagesCountProvider);
+    final unreadNotifications = ref.watch(unreadNotificationsCountProvider);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Risotto'),
         actions: [
+          IconButton(
+            tooltip: unreadNotifications > 0
+                ? 'Notifications, $unreadNotifications non lues'
+                : 'Notifications',
+            onPressed: () => context.push(AppRoutes.notifications),
+            icon: Badge(
+              isLabelVisible: unreadNotifications > 0,
+              label: Text('$unreadNotifications'),
+              backgroundColor: Theme.of(context).colorScheme.error,
+              textColor: Theme.of(context).colorScheme.onError,
+              child: const Icon(Icons.notifications_outlined),
+            ),
+          ),
           if (profile != null)
             IconButton(
               tooltip: 'Mon profil',

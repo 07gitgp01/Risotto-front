@@ -16,6 +16,8 @@ abstract final class AppRoutes {
   static const search = '/search';
   static const blockedUsers = '/network/blocked';
   static const messages = '/messages';
+  static const notifications = '/notifications';
+  static const notificationSettings = '/notifications/settings';
 
   /// Reachable without a session.
   static const publicRoutes = {login, register, forgotPassword, resetPassword};

@@ -17,6 +17,8 @@ import '../../features/contacts/presentation/scan_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/messaging/presentation/chat_screen.dart';
 import '../../features/messaging/presentation/conversations_screen.dart';
+import '../../features/notifications/presentation/notification_settings_screen.dart';
+import '../../features/notifications/presentation/notifications_screen.dart';
 import '../../features/home/presentation/splash_screen.dart';
 import '../../features/profile/application/my_profile_controller.dart';
 import '../../features/profile/presentation/edit_profile_screen.dart';
@@ -161,6 +163,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => ChatScreen(
               conversationId: state.pathParameters['conversationId']!,
             ),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.notifications,
+        builder: (context, state) => const NotificationsScreen(),
+        routes: [
+          GoRoute(
+            path: 'settings',
+            builder: (context, state) => const NotificationSettingsScreen(),
           ),
         ],
       ),
