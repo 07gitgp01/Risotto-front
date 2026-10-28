@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'auth_interceptor.dart';
 import 'dio_provider.dart';
 
 /// Checks that the API (and its database and Redis) is reachable.
@@ -16,7 +17,10 @@ class DioApiHealthRepository implements ApiHealthRepository {
   @override
   Future<bool> isHealthy() async {
     try {
-      final response = await _dio.get<Map<String, dynamic>>('/health');
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/health',
+        options: Options(extra: {skipAuthKey: true}),
+      );
       return response.statusCode == 200 && response.data?['status'] == 'ok';
     } on DioException {
       return false;
