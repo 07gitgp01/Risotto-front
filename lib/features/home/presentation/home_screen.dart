@@ -2,17 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_health_repository.dart';
+import '../../auth/application/auth_controller.dart';
 
-/// Temporary landing screen (milestone 1): shows the brand and the API connection status.
-class WelcomeScreen extends ConsumerWidget {
-  const WelcomeScreen({super.key});
+/// Temporary home (milestone 2): greets the user, shows the API status, signs out.
+/// Replaced by the dashboard in milestone 8.
+class HomeScreen extends ConsumerWidget {
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+    final auth = ref.watch(authControllerProvider);
     final health = ref.watch(apiHealthProvider);
+    final email = auth is Authenticated ? auth.user.email : '';
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Risotto'),
+        actions: [
+          IconButton(
+            tooltip: 'Se déconnecter',
+            icon: const Icon(Icons.logout),
+            onPressed: () => ref.read(authControllerProvider.notifier).logout(),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -23,15 +37,15 @@ class WelcomeScreen extends ConsumerWidget {
                 Semantics(
                   header: true,
                   child: Text(
-                    'Risotto',
-                    style: theme.textTheme.displayMedium?.copyWith(
+                    'Bienvenue',
+                    style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Votre réseau professionnel, à feu doux.',
+                  email,
                   style: theme.textTheme.titleMedium,
                   textAlign: TextAlign.center,
                 ),
