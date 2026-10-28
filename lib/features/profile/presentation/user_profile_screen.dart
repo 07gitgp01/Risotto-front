@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/router/app_routes.dart';
 import '../../connections/application/connections_providers.dart';
 import '../../connections/presentation/widgets/connection_button.dart';
+import '../../messaging/data/messaging_repository.dart';
 import '../application/my_profile_controller.dart';
 import '../data/profile_models.dart';
 import 'widgets/profile_details.dart';
@@ -62,6 +64,20 @@ class UserProfileScreen extends ConsumerWidget {
     }
   }
 
+  Future<void> _message(BuildContext context, WidgetRef ref) async {
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final conversation = await ref
+          .read(messagingRepositoryProvider)
+          .start(userId);
+      if (context.mounted) {
+        await context.push(AppRoutes.chat(conversation.id));
+      }
+    } on ApiException catch (error) {
+      messenger.showSnackBar(SnackBar(content: Text(error.message)));
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final profile = ref.watch(profileByIdProvider(userId));
@@ -108,6 +124,16 @@ class UserProfileScreen extends ConsumerWidget {
                   state: profile.connection!,
                 ),
               ),
+              if (profile.connection!.status == ConnectionStatus.connected) ...[
+                const SizedBox(height: 12),
+                Center(
+                  child: FilledButton.icon(
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    label: const Text('Envoyer un message'),
+                    onPressed: () => _message(context, ref),
+                  ),
+                ),
+              ],
             ],
           ],
         ),

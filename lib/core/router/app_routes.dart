@@ -15,6 +15,7 @@ abstract final class AppRoutes {
   static const network = '/network';
   static const search = '/search';
   static const blockedUsers = '/network/blocked';
+  static const messages = '/messages';
 
   /// Reachable without a session.
   static const publicRoutes = {login, register, forgotPassword, resetPassword};
@@ -25,4 +26,6 @@ abstract final class AppRoutes {
   static String userProfile(String userId) => '/users/$userId';
 
   static String contactDetail(String contactId) => '/contacts/$contactId';
+
+  static String chat(String conversationId) => '/messages/$conversationId';
 }

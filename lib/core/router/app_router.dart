@@ -15,6 +15,8 @@ import '../../features/contacts/presentation/contacts_screen.dart';
 import '../../features/contacts/presentation/my_card_screen.dart';
 import '../../features/contacts/presentation/scan_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/messaging/presentation/chat_screen.dart';
+import '../../features/messaging/presentation/conversations_screen.dart';
 import '../../features/home/presentation/splash_screen.dart';
 import '../../features/profile/application/my_profile_controller.dart';
 import '../../features/profile/presentation/edit_profile_screen.dart';
@@ -147,6 +149,18 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'blocked',
             builder: (context, state) => const BlockedUsersScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.messages,
+        builder: (context, state) => const ConversationsScreen(),
+        routes: [
+          GoRoute(
+            path: ':conversationId',
+            builder: (context, state) => ChatScreen(
+              conversationId: state.pathParameters['conversationId']!,
+            ),
           ),
         ],
       ),

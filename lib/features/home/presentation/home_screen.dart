@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/network/api_health_repository.dart';
 import '../../../core/router/app_routes.dart';
 import '../../auth/application/auth_controller.dart';
+import '../../messaging/application/messaging_providers.dart';
 import '../../profile/application/my_profile_controller.dart';
 import '../../profile/presentation/widgets/profile_avatar.dart';
 
@@ -20,6 +21,7 @@ class HomeScreen extends ConsumerWidget {
     final health = ref.watch(apiHealthProvider);
     final email = auth is Authenticated ? auth.user.email : '';
     final profile = ref.watch(myProfileProvider).value;
+    final unreadMessages = ref.watch(unreadMessagesCountProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -89,6 +91,12 @@ class HomeScreen extends ConsumerWidget {
                       onTap: () => context.push(AppRoutes.contacts),
                     ),
                     _HomeAction(
+                      icon: Icons.chat_bubble_outline,
+                      label: 'Messages',
+                      badge: unreadMessages,
+                      onTap: () => context.push(AppRoutes.messages),
+                    ),
+                    _HomeAction(
                       icon: Icons.group_outlined,
                       label: 'Réseau',
                       onTap: () => context.push(AppRoutes.network),
@@ -152,11 +160,15 @@ class _HomeAction extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.onTap,
+    this.badge = 0,
   });
 
   final IconData icon;
   final String label;
   final VoidCallback onTap;
+
+  /// Unread count shown on the icon (hidden when 0).
+  final int badge;
 
   @override
   Widget build(BuildContext context) {
@@ -173,9 +185,19 @@ class _HomeAction extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
             child: Column(
               children: [
-                Icon(icon, size: 32, color: colors.secondary),
+                Badge(
+                  isLabelVisible: badge > 0,
+                  label: Text('$badge'),
+                  backgroundColor: colors.error,
+                  textColor: colors.onError,
+                  child: Icon(icon, size: 32, color: colors.secondary),
+                ),
                 const SizedBox(height: 8),
-                Text(label, textAlign: TextAlign.center),
+                Text(
+                  label,
+                  textAlign: TextAlign.center,
+                  semanticsLabel: badge > 0 ? '$label, $badge non lus' : label,
+                ),
               ],
             ),
           ),
