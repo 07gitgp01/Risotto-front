@@ -24,6 +24,9 @@ Langue des échanges : français. Code, commits, noms techniques : anglais.
 | Alertes | Tomate | `#D6452F` |
 - Teinte dérivée `tomatoDeep` `#B23A26` (= `colorScheme.error`) pour le texte d'erreur et les boutons d'erreur : la tomate n'atteint que 4,1:1 sur crème. La tomate reste pour icônes, bordures, fonds. Le safran ne sert jamais de couleur de texte sur crème (2:1).
 - Les contrastes sont vérifiés par `test/core/theme/risotto_theme_test.dart` (WCAG AA 4.5:1).
+- Kit de marque (logo « La rencontre ») dans `assets/brand/` (sources SVG, exports PNG, README du kit) ; seul `assets/brand/png/` est embarqué dans l'app. Maquettes de référence (Stitch) dans `design/<écran>/` (`screen.png`, `code.html`, `risotto/DESIGN.md`) : non embarquées.
+- Icône d'app et écran de démarrage générés depuis le kit (config dans `pubspec.yaml`) : `dart run flutter_launcher_icons` puis `dart run flutter_native_splash:create` après toute modification du kit. Ne jamais retoucher à la main les fichiers générés dans `android/` et `ios/`.
+- Chargement plein écran : `RisottoLoader` (`lib/core/widgets/`), pas de `CircularProgressIndicator` nu.
 - Boutons safran avec **texte charbon** (lisibilité, contraste ≥ 4.5:1). Jamais de texte blanc sur safran.
 - Toujours passer par `Theme.of(context)` / `RisottoColors`, jamais de couleur en dur dans les widgets.
 - Accessibilité : `Semantics` sur les éléments interactifs sans texte, cibles tactiles ≥ 48 dp, support du text scaling.
