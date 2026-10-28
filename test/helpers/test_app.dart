@@ -6,6 +6,7 @@ import 'package:risotto/app.dart';
 import 'package:risotto/core/network/api_health_repository.dart';
 import 'package:risotto/core/storage/session_storage.dart';
 import 'package:risotto/features/auth/data/auth_repository.dart';
+import 'package:risotto/features/connections/data/connections_repository.dart';
 import 'package:risotto/features/contacts/application/contacts_providers.dart';
 import 'package:risotto/features/contacts/data/contacts_repository.dart';
 import 'package:risotto/features/contacts/presentation/scan_screen.dart';
@@ -13,6 +14,7 @@ import 'package:risotto/features/profile/application/photo_picker.dart';
 import 'package:risotto/features/profile/data/profile_repository.dart';
 
 import 'fake_auth_repository.dart';
+import 'fake_connections_repository.dart';
 import 'fake_contacts_repository.dart';
 import 'fake_profile_repository.dart';
 import 'in_memory_session_storage.dart';
@@ -44,6 +46,7 @@ Future<void> pumpRisottoApp(
   FakeContactsRepository? contacts,
   FakeCardSharer? cardSharer,
   List<String> scannerPayloads = const [],
+  FakeConnectionsRepository? connections,
   List<Override> extraOverrides = const [],
 }) async {
   await tester.pumpWidget(
@@ -66,6 +69,9 @@ Future<void> pumpRisottoApp(
         cardSharerProvider.overrideWithValue(cardSharer ?? FakeCardSharer()),
         qrScannerBuilderProvider.overrideWithValue(
           fakeScanner(scannerPayloads),
+        ),
+        connectionsRepositoryProvider.overrideWithValue(
+          connections ?? FakeConnectionsRepository(),
         ),
         ...extraOverrides,
       ],

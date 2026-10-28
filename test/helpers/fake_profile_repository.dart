@@ -27,11 +27,14 @@ Profile testProfile({
 
 /// In-memory profile backend. [mine] null means "not created yet".
 class FakeProfileRepository implements ProfileRepository {
-  FakeProfileRepository({this.mine, Map<String, Profile>? others})
+  FakeProfileRepository({this.mine, Map<String, Profile>? others, this.lookup})
     : others = others ?? {};
 
   Profile? mine;
   final Map<String, Profile> others;
+
+  /// Optional live source for other members (e.g. the connections fake).
+  Profile? Function(String userId)? lookup;
   ApiException? failWith;
   ProfileInput? lastInput;
   final List<String> calls = [];
@@ -118,7 +121,7 @@ class FakeProfileRepository implements ProfileRepository {
 
   @override
   Future<Profile> getById(String userId) => _run('getById', () {
-    final profile = others[userId];
+    final profile = others[userId] ?? lookup?.call(userId);
     if (profile == null) {
       throw const ApiException(ApiErrorKind.invalidInput, statusCode: 404);
     }
