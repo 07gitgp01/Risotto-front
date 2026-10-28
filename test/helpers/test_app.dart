@@ -12,6 +12,8 @@ import 'package:risotto/features/contacts/application/contacts_providers.dart';
 import 'package:risotto/features/contacts/data/contacts_repository.dart';
 import 'package:risotto/features/contacts/presentation/scan_screen.dart';
 import 'package:risotto/features/messaging/data/messaging_repository.dart';
+import 'package:risotto/features/notifications/application/push_registration.dart';
+import 'package:risotto/features/notifications/data/notifications_repository.dart';
 import 'package:risotto/features/profile/application/photo_picker.dart';
 import 'package:risotto/features/profile/data/profile_repository.dart';
 
@@ -19,6 +21,7 @@ import 'fake_auth_repository.dart';
 import 'fake_connections_repository.dart';
 import 'fake_contacts_repository.dart';
 import 'fake_messaging.dart';
+import 'fake_notifications.dart';
 import 'fake_profile_repository.dart';
 import 'in_memory_session_storage.dart';
 
@@ -52,6 +55,8 @@ Future<void> pumpRisottoApp(
   FakeConnectionsRepository? connections,
   FakeMessagingRepository? messaging,
   FakeRealtimeClient? realtime,
+  FakeNotificationsRepository? notifications,
+  FakePushService? push,
   List<Override> extraOverrides = const [],
 }) async {
   await tester.pumpWidget(
@@ -85,6 +90,10 @@ Future<void> pumpRisottoApp(
         realtimeClientProvider.overrideWithValue(
           realtime ?? FakeRealtimeClient(),
         ),
+        notificationsRepositoryProvider.overrideWithValue(
+          notifications ?? FakeNotificationsRepository(),
+        ),
+        pushServiceProvider.overrideWithValue(push ?? FakePushService()),
         ...extraOverrides,
       ],
       child: const RisottoApp(),
