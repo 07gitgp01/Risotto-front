@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-dim": "#d7dbd6", "secondary-container": "#aeedca", "on-primary": "#ffffff", "on-tertiary-fixed": "#400200", "primary": "#7f5700", "primary-fixed": "#ffdeae", "surface-container-low": "#f0f5f0", "outline-variant": "#d6c4ad", "inverse-on-surface": "#edf2ed", "on-primary-fixed-variant": "#604100", "surface": "#f6fbf5", "surface-container-lowest": "#ffffff", "on-primary-container": "#5b3d00", "on-surface": "#181d1a", "tertiary-fixed-dim": "#ffb4a6", "surface-tint": "#7f5700", "tertiary": "#b22b18", "on-tertiary": "#ffffff", "on-error": "#ffffff", "inverse-surface": "#2c322e", "on-background": "#181d1a", "outline": "#837561", "on-secondary-fixed": "#002113", "tertiary-fixed": "#ffdad4", "secondary-fixed": "#b1f0cd", "primary-container": "#e8a317", "secondary-fixed-dim": "#96d4b2", "on-secondary": "#ffffff", "surface-container-high": "#e5e9e4", "secondary": "#2d694d", "error-container": "#ffdad6", "on-surface-variant": "#514534", "surface-container": "#ebefea", "surface-variant": "#dfe4df", "error": "#ba1a1a", "primary-fixed-dim": "#ffba3e", "on-tertiary-fixed-variant": "#8f1002", "surface-bright": "#f6fbf5", "on-tertiary-container": "#890b00", "surface-container-highest": "#dfe4df", "on-primary-fixed": "#281900", "on-secondary-container": "#326e51", "inverse-primary": "#ffba3e", "on-secondary-fixed-variant": "#105137", "tertiary-container": "#ff927f", "background": "#f6fbf5", "on-error-container": "#93000a" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "margin": "1rem", "space-lg": "1.5rem", "space-md": "1rem", "space-xl": "2rem", "space-sm": "0.5rem", "space-xs": "0.25rem" }, fontFamily: { "headline-xl": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] }, fontSize: { "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }], "label-lg": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "700" }], "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }] } } } }</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-gutter flex items-center justify-between"><div class="flex items-center gap-space-xs"><button aria-label="Retour" class="flex items-center min-h-[44px] min-w-[44px] px-space-xs text-secondary font-label-lg text-label-lg hover:opacity-80 active:opacity-60 transition-opacity" onclick="history.back()"><span class="material-symbols-outlined text-xl mr-1">arrow_back_ios_new</span><span>Retour</span></button></div><h1 class="font-headline-sm text-headline-sm text-on-surface truncate text-center flex-1 px-space-xs">Résultat Du Scan</h1><div class="flex items-center justify-end min-w-[44px]"><button aria-label="Plus d'options" class="w-11 h-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:text-on-surface active:opacity-60 transition-colors"><span class="material-symbols-outlined text-2xl">more_vert</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface px-gutter min-h-screen"><div class="flex flex-col w-full pb-8">
+<!-- Verification Badge Notification -->
+<div class="w-full flex items-center justify-center pt-2 pb-4">
+<div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary-container shadow-sm animate-pulse">
+<span class="material-symbols-outlined text-secondary text-lg" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-label-sm text-on-secondary-container tracking-wide font-bold">QR Code vérifié sur le réseau Risotto</span>
+</div>
+</div>
+<!-- Profile Card Container -->
+<div class="w-full bg-surface-container-lowest rounded-xl shadow-[0_10px_25px_-5px_rgba(31,36,33,0.08),0_4px_10px_-2px_rgba(31,36,33,0.03)] p-5 relative overflow-hidden">
+<!-- Decorative Warm Accent Bar -->
+<div class="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-primary-container via-primary-fixed-dim to-secondary"></div>
+<!-- Avatar & Core Identity -->
+<div class="flex flex-col items-center text-center mt-2">
+<div class="relative w-24 h-24 mb-3">
+<div class="w-24 h-24 rounded-full overflow-hidden shadow-md">
+<img class="w-full h-full object-cover" data-alt="Portrait photography of Awa Ndiaye, a confident 30-year-old Senegalese female Lead Product Designer wearing warm modern attire in a bright Dakar creative studio with soft sunlit ambiance and subtle wooden architectural details" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDk44NynU-2rHE4_YbQAnUUebfvlaw_LlnHGpYPKWal8NC312j3BEbArZkkXzjTR9gbEvvz-DYduNtbboSZ1grrI4mzxMmBdR2Tg0_Nj7yZ2Qk1POJLxYA3tjyYjd_5A0Q672UTow1GP_whfHZvLGpthNrCwmvcObOHmIbyaAJJdB9_KiUwp0L_arQCsx4MczElXkDwuAa8SfDYKiepWkfXCDI2dL7i3CK72rqGDJhE"/>
+</div>
+<div class="absolute bottom-0 right-0 w-7 h-7 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-md">
+<span class="material-symbols-outlined text-base font-bold" style="font-variation-settings: 'FILL' 1;">check</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 justify-center mb-1">
+<h2 class="font-headline-md text-headline-md text-on-surface font-bold tracking-tight">Awa Ndiaye</h2>
+<span class="material-symbols-outlined text-primary-container text-xl" style="font-variation-settings: 'FILL' 1;" title="Profil Authentifié">verified</span>
+</div>
+<p class="font-label-lg text-label-lg text-secondary font-semibold max-w-[280px]">Lead Product Designer &amp; UX Strategist</p>
+<div class="flex items-center justify-center gap-1 text-on-surface-variant font-body-sm text-body-sm mt-1">
+<span class="material-symbols-outlined text-base">domain</span>
+<span>Sonatel / Orange</span>
+<span class="text-outline-variant">•</span>
+<span class="material-symbols-outlined text-base">location_on</span>
+<span>Dakar, Sénégal</span>
+</div>
+</div>
+<!-- Mutual Connections Pill -->
+<div class="mt-4 p-3 rounded-lg bg-surface-container-low flex items-center gap-2.5">
+<div class="flex -space-x-2 shrink-0">
+<div class="w-7 h-7 rounded-full overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Portrait of Amadou T., male tech entrepreneur in Dakar with a friendly smile, natural lighting and office backdrop" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBac79v1ixpCtp-aO9Kq6VDAlAL-AlynPQI04tZCg1vadH7d2sKYJHSQhSg4XAzca57MHbpRRQKGRjuQiOh0wR9uaDA_3ukWbWqyJSA2HWmMR-RFUjGUnjdrowVp1MaqiDyWKMu7-BlpeUDs4ZWNREHC9gZEAN1xcH19OO7W-L3cFsW6LZxrGiSLDT-17LM19gG0lTQicZCHJMPy1Ela7BkiAor8fyTjMb8rv4IbJ-_"/>
+</div>
+<div class="w-7 h-7 rounded-full overflow-hidden shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Portrait of Babacar D., Senegalese professional smiling warmly in an elegant linen shirt, high-end photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBL5TNfdrwRXP9BDe00hQj1WelleQlj849gQ0v0-XbBJxOUzBxC7KoTq8AyGSn01xXhofKJn5syjmr3nCJ7Ff3HTDvDo35iwhnH-rLNWCfqH5Z-VhGE8B9aPobOMnAnaVRWzkGhaXNN0GG9KW6UgZnAB0Z2ElNTV3K0sli0ta3rqaZLtWHa8ATta5MXd4KomsUtM-Ou9u8YzlEEcd9umbTsPagJGbz3H1-g3B5x5WkI"/>
+</div>
+</div>
+<div class="min-w-0 flex-1">
+<p class="font-body-sm text-body-sm text-on-surface truncate">
+<span class="font-semibold text-on-surface">14 relations</span> en commun dont <span class="font-medium text-secondary">Amadou T.</span> et <span class="font-medium text-secondary">Babacar D.</span>
+</p>
+</div>
+</div>
+<!-- Tags / Competences -->
+<div class="flex flex-wrap gap-1.5 mt-3 justify-center">
+<span class="px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium">Design System</span>
+<span class="px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium">FinTech</span>
+<span class="px-3 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium">Telecom</span>
+<span class="px-3 py-1 rounded-full bg-secondary-fixed font-label-sm text-label-sm text-on-secondary-fixed-variant font-medium">Mobile UX</span>
+</div>
+<!-- Mission / Summary Quote -->
+<div class="mt-4 p-3.5 rounded-lg bg-surface-container-lowest shadow-sm relative">
+<div class="flex items-start gap-2">
+<span class="material-symbols-outlined text-primary-container text-xl shrink-0 leading-none">format_quote</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant italic leading-relaxed">
+          « Passionnée par l’inclusion financière et l’ergonomie mobile pour l’Afrique de l’Ouest. »
+        </p>
+</div>
+</div>
+<!-- Contextual Encounter Note Section -->
+<div class="mt-4 pt-4">
+<div class="flex items-center justify-between mb-2">
+<label class="font-label-md text-label-md text-on-surface font-semibold flex items-center gap-1.5" for="meeting-note">
+<span class="material-symbols-outlined text-base text-secondary">edit_note</span>
+          Contexte de rencontre
+        </label>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Privé</span>
+</div>
+<div class="relative">
+<input class="w-full h-11 px-3.5 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm focus:outline-none focus:bg-surface-container-lowest shadow-inner" id="meeting-note" placeholder="Ex: Conférence, recommandation..." type="text" value="Rencontré au Salon Fintech Dakar 2025"/>
+<button aria-label="Effacer le texte" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-outline-variant hover:text-on-surface-variant w-7 h-7 flex items-center justify-center" onclick="document.getElementById('meeting-note').value=''" type="button">
+<span class="material-symbols-outlined text-base">cancel</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Primary and Secondary Actions -->
+<div class="w-full flex flex-col gap-3 mt-5">
+<!-- Main Call to Action: Connect -->
+<button class="w-full min-h-[48px] py-3 px-6 rounded-full bg-primary-container text-on-primary-container font-label-lg text-label-lg font-bold flex items-center justify-center gap-2.5 shadow-md active:scale-[0.98] transition-transform" id="connect-btn" onclick="handleConnect()" type="button">
+<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">person_add</span>
+<span>Envoyer une demande</span>
+</button>
+<!-- Secondary Action: Save vCard -->
+<button class="w-full min-h-[48px] py-3 px-6 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-lg text-label-lg font-bold flex items-center justify-center gap-2.5 shadow-sm active:scale-[0.98] transition-transform" id="vcard-btn" onclick="handleSaveVCard()" type="button">
+<span class="material-symbols-outlined text-xl">contact_page</span>
+<span>Enregistrer le contact (vCard)</span>
+</button>
+<!-- Direct Quick Message Shortcut -->
+<button class="w-full min-h-[44px] py-2 px-4 rounded-full text-secondary font-label-md text-label-md flex items-center justify-center gap-1.5 hover:bg-surface-container-low transition-colors" onclick="handleQuickMessage()" type="button">
+<span class="material-symbols-outlined text-lg">chat_bubble_outline</span>
+<span>Glisser un message spontané</span>
+</button>
+</div>
+<!-- Toast Notification Container -->
+<div class="fixed bottom-6 left-4 right-4 max-w-sm mx-auto bg-inverse-surface text-inverse-on-surface px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 transition-opacity duration-300 opacity-0 pointer-events-none z-50" id="toast">
+<span class="material-symbols-outlined text-secondary-fixed" id="toast-icon">check_circle</span>
+<p class="font-body-sm text-body-sm leading-tight flex-1" id="toast-message"></p>
+</div>
+</div>
+<script>
+  function showFeedback(message, icon) {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toast-message');
+    const toastIcon = document.getElementById('toast-icon');
+    
+    if (toast && toastMsg) {
+      toastMsg.textContent = message;
+      if (icon && toastIcon) toastIcon.textContent = icon;
+      toast.classList.remove('opacity-0', 'pointer-events-none');
+      toast.classList.add('opacity-100');
+      
+      setTimeout(() => {
+        toast.classList.remove('opacity-100');
+        toast.classList.add('opacity-0', 'pointer-events-none');
+      }, 3000);
+    }
+  }
+
+  function handleConnect() {
+    const btn = document.getElementById('connect-btn');
+    if (btn) {
+      btn.innerHTML = `<span class="material-symbols-outlined text-xl" style="font-variation-settings: 'FILL' 1;">check</span><span>Demande envoyée !</span>`;
+      btn.classList.remove('bg-primary-container', 'text-on-primary-container');
+      btn.classList.add('bg-surface-container-highest', 'text-on-surface-variant');
+      btn.disabled = true;
+    }
+    showFeedback("Demande transmise avec succès à Awa Ndiaye", "mark_email_read");
+  }
+
+  function handleSaveVCard() {
+    showFeedback("Contact 'Awa Ndiaye' téléchargé dans votre carnet d'adresses", "download_done");
+  }
+
+  function handleQuickMessage() {
+    showFeedback("Ouverture de la messagerie instantanée...", "chat");
+  }
+</script></main></body></html>

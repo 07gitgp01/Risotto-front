@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-dim": "#d7dbd6", "secondary-container": "#aeedca", "on-primary": "#ffffff", "on-tertiary-fixed": "#400200", "primary": "#7f5700", "primary-fixed": "#ffdeae", "surface-container-low": "#f0f5f0", "outline-variant": "#d6c4ad", "inverse-on-surface": "#edf2ed", "on-primary-fixed-variant": "#604100", "surface": "#f6fbf5", "surface-container-lowest": "#ffffff", "on-primary-container": "#5b3d00", "on-surface": "#181d1a", "tertiary-fixed-dim": "#ffb4a6", "surface-tint": "#7f5700", "tertiary": "#b22b18", "on-tertiary": "#ffffff", "on-error": "#ffffff", "inverse-surface": "#2c322e", "on-background": "#181d1a", "outline": "#837561", "on-secondary-fixed": "#002113", "tertiary-fixed": "#ffdad4", "secondary-fixed": "#b1f0cd", "primary-container": "#e8a317", "secondary-fixed-dim": "#96d4b2", "on-secondary": "#ffffff", "surface-container-high": "#e5e9e4", "secondary": "#2d694d", "error-container": "#ffdad6", "on-surface-variant": "#514534", "surface-container": "#ebefea", "surface-variant": "#dfe4df", "error": "#ba1a1a", "primary-fixed-dim": "#ffba3e", "on-tertiary-fixed-variant": "#8f1002", "surface-bright": "#f6fbf5", "on-tertiary-container": "#890b00", "surface-container-highest": "#dfe4df", "on-primary-fixed": "#281900", "on-secondary-container": "#326e51", "inverse-primary": "#ffba3e", "on-secondary-fixed-variant": "#105137", "tertiary-container": "#ff927f", "background": "#f6fbf5", "on-error-container": "#93000a" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "margin": "1rem", "space-lg": "1.5rem", "space-md": "1rem", "space-xl": "2rem", "space-sm": "0.5rem", "space-xs": "0.25rem" }, fontFamily: { "headline-xl": ["Plus Jakarta Sans"], "label-sm": ["Plus Jakarta Sans"], "body-lg": ["Plus Jakarta Sans"], "label-lg": ["Plus Jakarta Sans"], "body-sm": ["Plus Jakarta Sans"], "headline-md": ["Plus Jakarta Sans"], "body-md": ["Plus Jakarta Sans"], "headline-lg": ["Plus Jakarta Sans"], "label-md": ["Plus Jakarta Sans"], "headline-sm": ["Plus Jakarta Sans"] }, fontSize: { "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }], "label-sm": ["11px", { "lineHeight": "14px", "letterSpacing": "0.04em", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "26px", "fontWeight": "400" }], "label-lg": ["15px", { "lineHeight": "20px", "fontWeight": "600" }], "body-sm": ["13px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "700" }], "body-md": ["15px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg": ["26px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "label-md": ["13px", { "lineHeight": "18px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }] } } } }</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-gutter flex items-center justify-between"><div class="flex items-center gap-space-xs"><button aria-label="Retour" class="flex items-center min-h-[44px] min-w-[44px] px-space-xs text-secondary font-label-lg text-label-lg hover:opacity-80 active:opacity-60 transition-opacity" onclick="history.back()"><span class="material-symbols-outlined text-xl mr-1">arrow_back_ios_new</span><span>Retour</span></button></div><h1 class="font-headline-sm text-headline-sm text-on-surface truncate text-center flex-1 px-space-xs">Scanner Qr</h1><div class="flex items-center justify-end min-w-[44px]"><button aria-label="Plus d'options" class="w-11 h-11 min-h-[44px] min-w-[44px] flex items-center justify-center text-on-surface-variant hover:text-on-surface active:opacity-60 transition-colors"><span class="material-symbols-outlined text-2xl">more_vert</span></button></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface px-gutter min-h-screen"><div class="flex flex-col w-full pb-6">
+<!-- Top Viewfinder Action Strip -->
+<div class="flex items-center justify-between px-2 py-3 mb-2">
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-secondary/15 text-secondary">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">qr_code_scanner</span>
+</span>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Connexion instantanée</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Réseau d'affaires UEMOA</p>
+</div>
+</div>
+<!-- Flashlight shortcut pill -->
+<button aria-label="Activer ou désactiver la torche" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm transition-transform active:scale-95 shadow-sm" id="torchBtn">
+<span class="material-symbols-outlined text-lg text-primary-container" id="torchIcon">flash_on</span>
+<span id="torchLabel">Lampe</span>
+</button>
+</div>
+<!-- Camera Viewfinder Stage Card -->
+<div class="relative w-full aspect-[4/5] max-h-[460px] rounded-3xl overflow-hidden shadow-xl bg-inverse-surface flex items-center justify-center">
+<!-- Camera Preview Mock Graphic (Simulated bokeh / environment) -->
+<div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-screen scale-105" data-alt="Subtle warm ambient background depicting modern African tech conference meetup in Abidjan with soft bokeh lights and terracotta earth tones" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDLtk1kGI9HVnkXOJhwdlObbHD-7vLrZItEQFYfmdo_7CkJh1aGE8m-eL9DotSyAGu8IQqqcndVuO4pwCaLYpdfXCZZckFfYOPgBk7avX-89IsYhUG8xkp364pM9Fo6XZc9pvqi5-8V3kqHkmsv_6GbcLMEKEya5QucRYLE5bZoulFWa6raptlpTsa7MkeM6YPdtLw8YvW_dMoZDXoD2oUv7DFt5GY1qDVCfQij7t8s')"></div>
+<!-- Dim Scrim Layer with Radial Transparency Mask for realistic viewfinder focus -->
+<div class="absolute inset-0 bg-inverse-surface/75"></div>
+<!-- Live Scanner Viewfinder Frame -->
+<div class="relative w-64 h-64 rounded-3xl flex items-center justify-center shadow-[0_0_40px_rgba(232,163,23,0.18)]">
+<!-- High contrast translucent cutout backdrop -->
+<div class="absolute inset-0 rounded-3xl bg-surface-container-lowest/10 backdrop-blur-[1px]"></div>
+<!-- Animated Saffron Scan Line -->
+<div class="absolute inset-x-3 h-0.5 bg-gradient-to-r from-transparent via-primary-container to-transparent shadow-[0_0_12px_#e8a317] animate-[pulse_1.8s_ease-in-out_infinite]" id="scannerLaser" style="top: 15%;"></div>
+<!-- Corner Brackets (Stylized tactile modernism) -->
+<!-- Top Left -->
+<div class="absolute top-2 left-2 w-8 h-8 flex flex-col justify-start items-start">
+<div class="w-8 h-1.5 bg-primary-container rounded-t-full shadow-[0_0_6px_#e8a317]"></div>
+<div class="w-1.5 h-6 bg-primary-container rounded-bl-full shadow-[0_0_6px_#e8a317]"></div>
+</div>
+<!-- Top Right -->
+<div class="absolute top-2 right-2 w-8 h-8 flex flex-col justify-start items-end">
+<div class="w-8 h-1.5 bg-primary-container rounded-t-full shadow-[0_0_6px_#e8a317]"></div>
+<div class="w-1.5 h-6 bg-primary-container rounded-br-full shadow-[0_0_6px_#e8a317]"></div>
+</div>
+<!-- Bottom Left -->
+<div class="absolute bottom-2 left-2 w-8 h-8 flex flex-col justify-end items-start">
+<div class="w-1.5 h-6 bg-primary-container rounded-tl-full shadow-[0_0_6px_#e8a317]"></div>
+<div class="w-8 h-1.5 bg-primary-container rounded-b-full shadow-[0_0_6px_#e8a317]"></div>
+</div>
+<!-- Bottom Right -->
+<div class="absolute bottom-2 right-2 w-8 h-8 flex flex-col justify-end items-end">
+<div class="w-1.5 h-6 bg-primary-container rounded-tr-full shadow-[0_0_6px_#e8a317]"></div>
+<div class="w-8 h-1.5 bg-primary-container rounded-b-full shadow-[0_0_6px_#e8a317]"></div>
+</div>
+<!-- Floating Detection Pulse Indicator -->
+<div class="w-14 h-14 rounded-2xl bg-primary-container/15 flex items-center justify-center animate-ping opacity-30 pointer-events-none"></div>
+<div class="w-12 h-12 rounded-2xl bg-inverse-surface/40 flex items-center justify-center text-primary-fixed">
+<span class="material-symbols-outlined text-2xl">crop_free</span>
+</div>
+</div>
+<!-- Real-time Status Badge inside viewfinder -->
+<div class="absolute bottom-4 inset-x-6 flex items-center justify-center">
+<div class="px-3.5 py-1.5 rounded-full bg-inverse-surface/85 backdrop-blur-md flex items-center gap-2 shadow-md">
+<span class="w-2 h-2 rounded-full bg-secondary-fixed animate-pulse"></span>
+<span class="font-label-sm text-label-sm text-inverse-on-surface">Capteur optique actif</span>
+</div>
+</div>
+</div>
+<!-- Instruction Text Block -->
+<div class="text-center px-4 pt-5 pb-4">
+<p class="font-headline-sm text-headline-sm text-on-surface mb-1">
+      Placez le QR code dans le cadre
+    </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-xs mx-auto">
+      Le scan s'effectue automatiquement. Idéal pour cartes de visite, stands de conférence et profils certifiés.
+    </p>
+</div>
+<!-- Bottom Utility & Mode Switcher Card -->
+<div class="bg-surface-container-lowest rounded-3xl p-4 shadow-sm flex flex-col gap-4">
+<!-- Action Buttons Row -->
+<div class="grid grid-cols-2 gap-3">
+<!-- Toggle Torch Button -->
+<button class="flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-surface-container-low text-on-surface hover:bg-surface-container active:scale-[0.98] transition-all" id="torchActionCard">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined text-xl">highlight</span>
+</div>
+<span class="font-label-md text-label-md">Éclairage</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Activer la torche</span>
+</button>
+<!-- Import Gallery Button -->
+<button class="flex flex-col items-center justify-center gap-1.5 py-3 px-2 rounded-2xl bg-surface-container-low text-on-surface hover:bg-surface-container active:scale-[0.98] transition-all">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed">
+<span class="material-symbols-outlined text-xl">photo_library</span>
+</div>
+<span class="font-label-md text-label-md">Galerie</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Importer une image</span>
+</button>
+</div>
+<!-- Mode Switcher Pill ('Scanner' vs 'Mon code') -->
+<div class="w-full p-1 bg-surface-container rounded-full flex items-center justify-between">
+<button class="flex-1 py-2.5 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-1.5 shadow-sm transition-all" id="tabScan" onclick="selectTab('scan')">
+<span class="material-symbols-outlined text-lg">center_focus_strong</span>
+<span>Scanner</span>
+</button>
+<button class="flex-1 py-2.5 rounded-full text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg flex items-center justify-center gap-1.5 transition-all" id="tabMyCode" onclick="selectTab('myCode')">
+<span class="material-symbols-outlined text-lg">badge</span>
+<span>Mon code</span>
+</button>
+</div>
+</div>
+<!-- Micro-tips banner -->
+<div class="mt-4 px-4 py-3 rounded-2xl bg-surface-container-low flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-xl">verified_user</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-snug">
+      Tous les profils flashés via l'application garantissent l'authenticité des badges professionnels.
+    </p>
+</div>
+</div>
+<script>
+  // Dynamic scanning laser animation
+  let laserPos = 15;
+  let laserForward = true;
+  const laserEl = document.getElementById('scannerLaser');
+
+  function animateScanLine() {
+    if (laserEl) {
+      if (laserForward) {
+        laserPos += 1.4;
+        if (laserPos >= 85) laserForward = false;
+      } else {
+        laserPos -= 1.4;
+        if (laserPos <= 15) laserForward = true;
+      }
+      laserEl.style.top = laserPos + '%';
+    }
+    requestAnimationFrame(animateScanLine);
+  }
+  requestAnimationFrame(animateScanLine);
+
+  // Flashlight toggle state
+  let isTorchOn = false;
+  const torchBtn = document.getElementById('torchBtn');
+  const torchActionCard = document.getElementById('torchActionCard');
+  const torchLabel = document.getElementById('torchLabel');
+  const torchIcon = document.getElementById('torchIcon');
+
+  function toggleTorch() {
+    isTorchOn = !isTorchOn;
+    if (isTorchOn) {
+      torchLabel.textContent = 'Allumée';
+      torchBtn.classList.replace('bg-surface-container-high', 'bg-primary-container');
+      torchBtn.classList.replace('text-on-surface', 'text-on-primary');
+      torchIcon.classList.replace('text-primary-container', 'text-on-primary');
+    } else {
+      torchLabel.textContent = 'Lampe';
+      torchBtn.classList.replace('bg-primary-container', 'bg-surface-container-high');
+      torchBtn.classList.replace('text-on-primary', 'text-on-surface');
+      torchIcon.classList.replace('text-on-primary', 'text-primary-container');
+    }
+  }
+
+  if (torchBtn) torchBtn.addEventListener('click', toggleTorch);
+  if (torchActionCard) torchActionCard.addEventListener('click', toggleTorch);
+
+  // Mode switcher handler
+  function selectTab(mode) {
+    const tabScan = document.getElementById('tabScan');
+    const tabMyCode = document.getElementById('tabMyCode');
+    if (!tabScan || !tabMyCode) return;
+
+    if (mode === 'scan') {
+      tabScan.className = 'flex-1 py-2.5 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-1.5 shadow-sm transition-all';
+      tabMyCode.className = 'flex-1 py-2.5 rounded-full text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg flex items-center justify-center gap-1.5 transition-all';
+    } else {
+      tabMyCode.className = 'flex-1 py-2.5 rounded-full bg-secondary text-on-secondary font-label-lg text-label-lg flex items-center justify-center gap-1.5 shadow-sm transition-all';
+      tabScan.className = 'flex-1 py-2.5 rounded-full text-on-surface-variant hover:text-on-surface font-label-lg text-label-lg flex items-center justify-center gap-1.5 transition-all';
+    }
+  }
+</script></main></body></html>
