@@ -3,9 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/offline/connectivity.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/risotto_theme.dart';
 import 'features/auth/application/auth_controller.dart';
+import 'features/dashboard/application/dashboard_provider.dart';
+import 'features/messaging/application/messaging_providers.dart';
 import 'features/notifications/application/notifications_providers.dart';
 import 'features/notifications/application/push_registration.dart';
 import 'features/notifications/presentation/notification_routes.dart';
@@ -78,6 +81,56 @@ class _RisottoAppState extends ConsumerState<RisottoApp> {
       theme: buildRisottoTheme(),
       scaffoldMessengerKey: scaffoldMessengerKey,
       routerConfig: ref.watch(appRouterProvider),
+      builder: (context, child) => Column(
+        children: [
+          if (ref.watch(offlineProvider)) const _OfflineBanner(),
+          Expanded(child: child ?? const SizedBox.shrink()),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown on top of every screen while the API is unreachable.
+class _OfflineBanner extends ConsumerWidget {
+  const _OfflineBanner();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final colors = Theme.of(context).colorScheme;
+    return Material(
+      color: colors.inverseSurface,
+      child: SafeArea(
+        bottom: false,
+        child: Semantics(
+          liveRegion: true,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Icon(Icons.cloud_off, color: colors.onInverseSurface, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    'Hors ligne : dernières données connues, envoi impossible.',
+                    style: TextStyle(color: colors.onInverseSurface),
+                  ),
+                ),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: colors.onInverseSurface,
+                  ),
+                  // Any successful request clears the banner.
+                  onPressed: () => ref
+                    ..invalidate(dashboardProvider)
+                    ..invalidate(conversationsProvider),
+                  child: const Text('Réessayer'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

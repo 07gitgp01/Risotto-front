@@ -184,6 +184,26 @@ class _Bubble extends StatelessWidget {
     // Mine: basil with white text; theirs: light card with charcoal text.
     final background = mine ? colors.secondary : colors.surfaceContainerLowest;
     final foreground = mine ? colors.onSecondary : colors.onSurface;
+    // One coherent sentence for screen readers instead of separate fragments.
+    final spoken = [
+      mine ? 'Vous' : 'Message reçu',
+      message.body,
+      shortTime(message.createdAt),
+      ?receipt,
+    ].join(', ');
+    return Semantics(
+      label: spoken,
+      excludeSemantics: true,
+      child: _bubbleLayout(context, background, foreground, textTheme),
+    );
+  }
+
+  Widget _bubbleLayout(
+    BuildContext context,
+    Color background,
+    Color foreground,
+    TextTheme textTheme,
+  ) {
     return Align(
       alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
       child: ConstrainedBox(
