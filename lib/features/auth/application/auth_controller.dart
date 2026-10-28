@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/offline/response_cache.dart';
 import '../../../core/storage/session_storage.dart';
 import '../../notifications/application/push_registration.dart';
 import '../data/auth_models.dart';
@@ -108,6 +109,12 @@ class AuthController extends Notifier<AuthState> {
 
   Future<void> _signOutLocally() async {
     await _storage.clear();
+    // Cached screens belong to this account: never show them to the next one.
+    try {
+      await ref.read(responseCacheProvider).clear();
+    } on Object {
+      // Best effort.
+    }
     state = const Unauthenticated();
   }
 
