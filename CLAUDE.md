@@ -66,7 +66,8 @@ flutter build apk --debug
 - Messagerie : envoi HTTP, réception WebSocket ; `chatProvider(conversationId)` dédoublonne par id (réponse HTTP + évènement socket).
 - Notifications : `notificationsProvider` (liste tenue à jour par `notification:new`), bandeau in-app global via `scaffoldMessengerKey` (app.dart). Push derrière `PushService` (`DisabledPushService` sauf `--dart-define=FCM_ENABLED=true`) ; `PushRegistration` ne doit pas dépendre de l'état d'auth (cycle Riverpod) : enregistrement déclenché par app.dart à la connexion, désenregistrement par `AuthController.logout()` avant la révocation.
 - Firebase : `google-services.json` / `GoogleService-Info.plist` jamais commités ; le plugin Gradle google-services n'est appliqué que si le fichier existe.
-- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, health:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:, connections:, messaging:, realtime:, notifications:, push:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
+- Accueil = tableau de bord (`dashboardProvider`) : rechargé sur évènements temps réel (anti-rebond 300 ms) et après chaque action de relation via `networkRevisionProvider` (ne pas `watch` les listes de relations depuis le tableau de bord : erreur Riverpod « markNeedsBuild during build »).
+- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:, connections:, messaging:, realtime:, notifications:, push:, dashboard:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
 - Faux HTTP pour tester les repositories : `test/helpers/fake_http_adapter.dart`.
 
 ## Jalons
@@ -77,5 +78,5 @@ flutter build apk --debug
 - [x] 5. Mise en relation (recherche, demande, acceptation/refus, blocage)
 - [x] 6. Messagerie (WebSocket, historique paginé, accusés de lecture)
 - [x] 7. Notifications (temps réel, push FCM, préférences)
-- [ ] 8. Tableau de bord (demandes en attente, non lus, activité récente)
+- [x] 8. Tableau de bord (demandes en attente, non lus, activité récente)
 - [ ] 9. Finalisation (sécurité, performances, accessibilité, hors ligne)
