@@ -9,6 +9,9 @@ abstract final class AppRoutes {
   static const myProfile = '/profile';
   static const editProfile = '/profile/edit';
   static const userProfilePattern = '/users/:userId';
+  static const myCard = '/card';
+  static const scan = '/scan';
+  static const contacts = '/contacts';
 
   /// Reachable without a session.
   static const publicRoutes = {login, register, forgotPassword, resetPassword};
@@ -17,4 +20,6 @@ abstract final class AppRoutes {
       Uri(path: resetPassword, queryParameters: {'email': email}).toString();
 
   static String userProfile(String userId) => '/users/$userId';
+
+  static String contactDetail(String contactId) => '/contacts/$contactId';
 }

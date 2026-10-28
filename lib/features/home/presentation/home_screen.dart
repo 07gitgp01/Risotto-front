@@ -68,6 +68,29 @@ class HomeScreen extends ConsumerWidget {
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  alignment: WrapAlignment.center,
+                  children: [
+                    _HomeAction(
+                      icon: Icons.qr_code_2,
+                      label: 'Ma carte',
+                      onTap: () => context.push(AppRoutes.myCard),
+                    ),
+                    _HomeAction(
+                      icon: Icons.qr_code_scanner,
+                      label: 'Scanner',
+                      onTap: () => context.push(AppRoutes.scan),
+                    ),
+                    _HomeAction(
+                      icon: Icons.contacts_outlined,
+                      label: 'Contacts',
+                      onTap: () => context.push(AppRoutes.contacts),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 32),
                 health.when(
                   loading: () => const CircularProgressIndicator(
                     semanticsLabel: 'Connexion au serveur',
@@ -110,6 +133,44 @@ class _ApiStatus extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class _HomeAction extends StatelessWidget {
+  const _HomeAction({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    return SizedBox(
+      width: 104,
+      child: Material(
+        color: colors.surfaceContainer,
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+            child: Column(
+              children: [
+                Icon(icon, size: 32, color: colors.secondary),
+                const SizedBox(height: 8),
+                Text(label, textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

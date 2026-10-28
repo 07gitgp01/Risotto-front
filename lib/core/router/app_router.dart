@@ -7,6 +7,10 @@ import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/reset_password_screen.dart';
+import '../../features/contacts/presentation/contact_detail_screen.dart';
+import '../../features/contacts/presentation/contacts_screen.dart';
+import '../../features/contacts/presentation/my_card_screen.dart';
+import '../../features/contacts/presentation/scan_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/home/presentation/splash_screen.dart';
 import '../../features/profile/application/my_profile_controller.dart';
@@ -108,6 +112,26 @@ final appRouterProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: 'edit',
             builder: (context, state) => const EditProfileScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.myCard,
+        builder: (context, state) => const MyCardScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.scan,
+        builder: (context, state) => const ScanScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.contacts,
+        builder: (context, state) => const ContactsScreen(),
+        routes: [
+          GoRoute(
+            path: ':contactId',
+            builder: (context, state) => ContactDetailScreen(
+              contactId: state.pathParameters['contactId']!,
+            ),
           ),
         ],
       ),
