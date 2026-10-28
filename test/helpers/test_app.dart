@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:risotto/app.dart';
+import 'package:risotto/core/offline/response_cache.dart';
 import 'package:risotto/core/realtime/realtime_client.dart';
 import 'package:risotto/core/storage/session_storage.dart';
 import 'package:risotto/features/auth/data/auth_repository.dart';
@@ -43,6 +44,7 @@ Future<void> pumpRisottoApp(
   FakeNotificationsRepository? notifications,
   FakePushService? push,
   FakeDashboardRepository? dashboard,
+  ResponseCache? responseCache,
   List<Override> extraOverrides = const [],
 }) async {
   await tester.pumpWidget(
@@ -79,6 +81,9 @@ Future<void> pumpRisottoApp(
         pushServiceProvider.overrideWithValue(push ?? FakePushService()),
         dashboardRepositoryProvider.overrideWithValue(
           dashboard ?? FakeDashboardRepository(),
+        ),
+        responseCacheProvider.overrideWithValue(
+          responseCache ?? MemoryResponseCache(),
         ),
         ...extraOverrides,
       ],
