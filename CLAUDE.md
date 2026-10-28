@@ -60,14 +60,15 @@ flutter build apk --debug
 - Redirections : `appRedirect(auth, profileStatus, location)` pur dans `core/router/app_router.dart` ; sans profil ⇒ `/profile/setup` ; statut `unknown` (chargement, hors ligne) ⇒ jamais bloquant. Routes publiques dans `AppRoutes.publicRoutes`.
 - Profil : `myProfileProvider` (AsyncNotifier, `null` = à créer, rechargé à chaque changement d'auth) ; photos téléchargées via dio authentifié (`profilePhotoProvider`, clé = URL versionnée) puis `MemoryImage`. Sélection d'image derrière `PhotoPicker` (fake en test).
 - Erreurs API : `ApiException` (`guardApi`) avec message français générique ; chaque écran précise le message selon `kind`.
-- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, health:, profiles:, photoPicker:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
+- Contacts : QR affiché par `qr_flutter` (modules charbon sur fond blanc, contraste maximal), scan par `mobile_scanner` derrière `qrScannerBuilderProvider` (remplacé en test par des boutons `scan:<payload>`), partage vCard via `CardSharer` (share_plus).
+- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, health:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
 - Faux HTTP pour tester les repositories : `test/helpers/fake_http_adapter.dart`.
 
 ## Jalons
 - [x] 1. Fondations (structure, CI, configuration, thème Risotto)
 - [x] 2. Authentification (écrans inscription, connexion, mot de passe oublié, refresh, déconnexion)
 - [x] 3. Profil (création, édition, photo, visibilité)
-- [ ] 4. Contacts et partage (carte de contact, QR code personnel, scan)
+- [x] 4. Contacts et partage (carte de contact, QR code personnel, scan)
 - [ ] 5. Mise en relation (recherche, demande, acceptation/refus, blocage)
 - [ ] 6. Messagerie (WebSocket, historique paginé, accusés de lecture)
 - [ ] 7. Notifications (temps réel, push FCM, préférences)
