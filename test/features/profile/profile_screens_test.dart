@@ -60,7 +60,7 @@ void main() {
       await tapText(tester, 'Créer mon profil');
 
       expect(profiles.lastInput!.firstName, 'Alice');
-      expect(find.text('Bienvenue, Alice'), findsOneWidget);
+      expect(find.text('Bonjour, Alice'), findsOneWidget);
     });
   });
 

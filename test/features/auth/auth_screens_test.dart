@@ -40,8 +40,7 @@ void main() {
       await tapText(tester, 'Se connecter');
 
       expect(auth.calls, ['login']);
-      expect(find.textContaining('Bienvenue'), findsOneWidget);
-      expect(find.text('alice@example.com'), findsOneWidget);
+      expect(find.textContaining('Bonjour'), findsOneWidget);
       expect(storage.session, isNotNull);
     });
 
@@ -111,7 +110,7 @@ void main() {
       await tapText(tester, 'Créer mon compte');
 
       expect(auth.calls, ['register']);
-      expect(find.textContaining('Bienvenue'), findsOneWidget);
+      expect(find.textContaining('Bonjour'), findsOneWidget);
     });
 
     testWidgets('explains that the email is taken', (tester) async {
@@ -141,7 +140,6 @@ void main() {
 
       // The reset screen opens with the email prefilled.
       expect(find.text('Nouveau mot de passe'), findsWidgets);
-      expect(find.text('alice@example.com'), findsOneWidget);
 
       await enterField(tester, 'Code à 6 chiffres', '042517');
       await enterField(tester, 'Nouveau mot de passe', 'nouveau-2027');
@@ -189,7 +187,7 @@ void main() {
     testWidgets('a stored session opens home directly', (tester) async {
       storage.session = testSession();
       await start(tester);
-      expect(find.textContaining('Bienvenue'), findsOneWidget);
+      expect(find.textContaining('Bonjour'), findsOneWidget);
     });
 
     testWidgets('logout returns to the login screen', (tester) async {

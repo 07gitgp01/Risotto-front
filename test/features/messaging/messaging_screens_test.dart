@@ -6,6 +6,7 @@ import 'package:risotto/features/messaging/presentation/time_format.dart';
 import 'package:risotto/features/profile/data/profile_models.dart';
 
 import '../../helpers/fake_connections_repository.dart';
+import '../../helpers/fake_dashboard.dart';
 import '../../helpers/fake_messaging.dart';
 import '../../helpers/fake_profile_repository.dart';
 import '../../helpers/in_memory_session_storage.dart';
@@ -42,7 +43,13 @@ void main() {
   }
 
   testWidgets('home shows the unread badge', (tester) async {
-    await start(tester);
+    await pumpRisottoApp(
+      tester,
+      storage: InMemorySessionStorage(testSession()),
+      messaging: messaging,
+      realtime: realtime,
+      dashboard: FakeDashboardRepository(busyDashboardJson()),
+    );
     final badge = tester.widget<Badge>(
       find.ancestor(
         of: find.byIcon(Icons.chat_bubble_outline),
@@ -50,7 +57,7 @@ void main() {
       ),
     );
     expect(badge.isLabelVisible, isTrue);
-    expect((badge.label! as Text).data, '1');
+    expect((badge.label! as Text).data, '2');
   });
 
   testWidgets('lists conversations with the last message', (tester) async {

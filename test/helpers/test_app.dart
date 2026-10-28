@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:risotto/app.dart';
-import 'package:risotto/core/network/api_health_repository.dart';
 import 'package:risotto/core/realtime/realtime_client.dart';
 import 'package:risotto/core/storage/session_storage.dart';
 import 'package:risotto/features/auth/data/auth_repository.dart';
@@ -11,6 +10,7 @@ import 'package:risotto/features/connections/data/connections_repository.dart';
 import 'package:risotto/features/contacts/application/contacts_providers.dart';
 import 'package:risotto/features/contacts/data/contacts_repository.dart';
 import 'package:risotto/features/contacts/presentation/scan_screen.dart';
+import 'package:risotto/features/dashboard/data/dashboard_repository.dart';
 import 'package:risotto/features/messaging/data/messaging_repository.dart';
 import 'package:risotto/features/notifications/application/push_registration.dart';
 import 'package:risotto/features/notifications/data/notifications_repository.dart';
@@ -20,25 +20,11 @@ import 'package:risotto/features/profile/data/profile_repository.dart';
 import 'fake_auth_repository.dart';
 import 'fake_connections_repository.dart';
 import 'fake_contacts_repository.dart';
+import 'fake_dashboard.dart';
 import 'fake_messaging.dart';
 import 'fake_notifications.dart';
 import 'fake_profile_repository.dart';
 import 'in_memory_session_storage.dart';
-
-class FakeApiHealthRepository implements ApiHealthRepository {
-  FakeApiHealthRepository([List<bool>? results]) : results = results ?? [true];
-
-  /// Returned in order, one per call; the last one repeats.
-  final List<bool> results;
-  int calls = 0;
-
-  @override
-  Future<bool> isHealthy() async {
-    final index = calls < results.length ? calls : results.length - 1;
-    calls++;
-    return results[index];
-  }
-}
 
 /// Pumps the whole app with fakes for every external dependency.
 /// By default the signed-in user already has a profile.
@@ -46,7 +32,6 @@ Future<void> pumpRisottoApp(
   WidgetTester tester, {
   FakeAuthRepository? auth,
   InMemorySessionStorage? storage,
-  FakeApiHealthRepository? health,
   FakeProfileRepository? profiles,
   FakePhotoPicker? photoPicker,
   FakeContactsRepository? contacts,
@@ -57,6 +42,7 @@ Future<void> pumpRisottoApp(
   FakeRealtimeClient? realtime,
   FakeNotificationsRepository? notifications,
   FakePushService? push,
+  FakeDashboardRepository? dashboard,
   List<Override> extraOverrides = const [],
 }) async {
   await tester.pumpWidget(
@@ -65,9 +51,6 @@ Future<void> pumpRisottoApp(
         authRepositoryProvider.overrideWithValue(auth ?? FakeAuthRepository()),
         sessionStorageProvider.overrideWithValue(
           storage ?? InMemorySessionStorage(),
-        ),
-        apiHealthRepositoryProvider.overrideWithValue(
-          health ?? FakeApiHealthRepository(),
         ),
         profileRepositoryProvider.overrideWithValue(
           profiles ?? FakeProfileRepository(mine: testProfile()),
@@ -94,6 +77,9 @@ Future<void> pumpRisottoApp(
           notifications ?? FakeNotificationsRepository(),
         ),
         pushServiceProvider.overrideWithValue(push ?? FakePushService()),
+        dashboardRepositoryProvider.overrideWithValue(
+          dashboard ?? FakeDashboardRepository(),
+        ),
         ...extraOverrides,
       ],
       child: const RisottoApp(),

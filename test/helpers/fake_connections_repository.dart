@@ -133,6 +133,16 @@ class FakeConnectionsRepository implements ConnectionsRepository {
 
   Connection _replace(String id, String status) {
     final index = all.indexWhere((c) => c.id == id);
+    if (index < 0) {
+      // Unknown to this fake (e.g. a request shown by the dashboard fake).
+      return Connection(
+        id: id,
+        status: status,
+        direction: RequestDirection.incoming,
+        createdAt: DateTime(2026),
+        user: member('unknown', 'Membre', 'Inconnu'),
+      );
+    }
     final old = all[index];
     return all[index] = Connection(
       id: old.id,
