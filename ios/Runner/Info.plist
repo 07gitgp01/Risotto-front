@@ -45,6 +45,10 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Risotto utilise l’appareil photo pour votre photo de profil et pour scanner les QR codes.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Risotto accède à vos photos pour choisir votre photo de profil.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<!-- Allows plain HTTP to localhost only (local development API). -->
