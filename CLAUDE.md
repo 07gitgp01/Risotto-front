@@ -67,7 +67,10 @@ flutter build apk --debug
 - Notifications : `notificationsProvider` (liste tenue à jour par `notification:new`), bandeau in-app global via `scaffoldMessengerKey` (app.dart). Push derrière `PushService` (`DisabledPushService` sauf `--dart-define=FCM_ENABLED=true`) ; `PushRegistration` ne doit pas dépendre de l'état d'auth (cycle Riverpod) : enregistrement déclenché par app.dart à la connexion, désenregistrement par `AuthController.logout()` avant la révocation.
 - Firebase : `google-services.json` / `GoogleService-Info.plist` jamais commités ; le plugin Gradle google-services n'est appliqué que si le fichier existe.
 - Accueil = tableau de bord (`dashboardProvider`) : rechargé sur évènements temps réel (anti-rebond 300 ms) et après chaque action de relation via `networkRevisionProvider` (ne pas `watch` les listes de relations depuis le tableau de bord : erreur Riverpod « markNeedsBuild during build »).
-- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:, connections:, messaging:, realtime:, notifications:, push:, dashboard:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
+- Hors ligne : `OfflineInterceptor` (dio) mémorise les GET des écrans principaux par utilisateur (`ResponseCache`, fichier privé) et les rejoue en cas d'erreur réseau ; `offlineProvider` pilote le bandeau global (app.dart). Cache vidé par `AuthController` à la déconnexion. Pas de file d'attente d'envoi.
+- Accessibilité : bulles de chat lues en une phrase (`Semantics(excludeSemantics)`), tests de grandes polices (`textScaleFactorTestValue = 2`) et des guidelines Flutter sur les écrans principaux.
+- Android : `allowBackup=false` + `data_extraction_rules.xml` (jetons et cache jamais sauvegardés ni transférés).
+- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:, connections:, messaging:, realtime:, notifications:, push:, dashboard:, responseCache:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
 - Faux HTTP pour tester les repositories : `test/helpers/fake_http_adapter.dart`.
 
 ## Jalons
@@ -79,4 +82,4 @@ flutter build apk --debug
 - [x] 6. Messagerie (WebSocket, historique paginé, accusés de lecture)
 - [x] 7. Notifications (temps réel, push FCM, préférences)
 - [x] 8. Tableau de bord (demandes en attente, non lus, activité récente)
-- [ ] 9. Finalisation (sécurité, performances, accessibilité, hors ligne)
+- [x] 9. Finalisation (sécurité, performances, accessibilité, hors ligne)

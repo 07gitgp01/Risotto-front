@@ -39,6 +39,12 @@ Pour activer le push :
 2. iOS : activer les capacités *Push Notifications* et *Background Modes > Remote notifications* dans Xcode, et déposer une clé APNs dans la console Firebase.
 3. Lancer avec `flutter run --dart-define=FCM_ENABLED=true`.
 
+## Hors ligne
+
+- La session et le dernier état connu des écrans principaux (tableau de bord, profil, conversations et première page de chaque historique, contacts, relations, notifications) sont gardés sur l'appareil.
+- Sans réseau, l'app les affiche avec un bandeau « Hors ligne » ; les actions (envoyer un message, accepter une demande…) affichent une erreur au lieu d'être mises en file d'attente.
+- Ce cache est stocké dans le dossier privé de l'app, exclu des sauvegardes Android, et effacé à la déconnexion. Il contient des messages en clair : c'est l'appareil qui le protège (verrouillage de l'écran).
+
 ## Qualité
 
 ```bash
