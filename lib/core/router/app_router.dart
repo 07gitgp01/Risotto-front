@@ -9,29 +9,68 @@ import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/reset_password_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/home/presentation/splash_screen.dart';
+import '../../features/profile/application/my_profile_controller.dart';
+import '../../features/profile/presentation/edit_profile_screen.dart';
+import '../../features/profile/presentation/my_profile_screen.dart';
+import '../../features/profile/presentation/profile_setup_screen.dart';
+import '../../features/profile/presentation/user_profile_screen.dart';
 import 'app_routes.dart';
 
-/// Where to send the user for [location] given the auth state, or null to stay.
-String? authRedirect(AuthState auth, String location) {
+/// Whether the signed-in user already has a profile. `unknown` while loading or
+/// offline: the user is then never forced onto the setup screen.
+enum ProfileStatus { unknown, missing, present }
+
+ProfileStatus profileStatusOf(AsyncValue<Object?> profile) => switch (profile) {
+  AsyncData(value: null) => ProfileStatus.missing,
+  AsyncData() => ProfileStatus.present,
+  _ => ProfileStatus.unknown,
+};
+
+/// Where to send the user for [location], or null to stay.
+String? appRedirect(AuthState auth, ProfileStatus profile, String location) {
   final isPublic = AppRoutes.publicRoutes.contains(location);
-  return switch (auth) {
-    AuthUnknown() => location == AppRoutes.splash ? null : AppRoutes.splash,
-    Unauthenticated() => isPublic ? null : AppRoutes.login,
-    Authenticated() =>
-      isPublic || location == AppRoutes.splash ? AppRoutes.home : null,
-  };
+  switch (auth) {
+    case AuthUnknown():
+      return location == AppRoutes.splash ? null : AppRoutes.splash;
+    case Unauthenticated():
+      return isPublic ? null : AppRoutes.login;
+    case Authenticated():
+      if (profile == ProfileStatus.missing) {
+        return location == AppRoutes.profileSetup
+            ? null
+            : AppRoutes.profileSetup;
+      }
+      if (isPublic ||
+          location == AppRoutes.splash ||
+          (location == AppRoutes.profileSetup &&
+              profile == ProfileStatus.present)) {
+        return AppRoutes.home;
+      }
+      return null;
+  }
+}
+
+class _RouterRefresh extends ChangeNotifier {
+  void notify() => notifyListeners();
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
-  // Re-runs the redirect whenever the auth state changes.
-  final refresh = ValueNotifier<AuthState>(ref.read(authControllerProvider));
-  ref.listen(authControllerProvider, (_, next) => refresh.value = next);
+  // Re-runs the redirect whenever the auth state or the profile status changes.
+  final refresh = _RouterRefresh();
+  ref.listen(authControllerProvider, (_, _) => refresh.notify());
+  ref.listen(
+    myProfileProvider.select(profileStatusOf),
+    (_, _) => refresh.notify(),
+  );
 
   final router = GoRouter(
     initialLocation: AppRoutes.splash,
     refreshListenable: refresh,
-    redirect: (context, state) =>
-        authRedirect(ref.read(authControllerProvider), state.matchedLocation),
+    redirect: (context, state) => appRedirect(
+      ref.read(authControllerProvider),
+      profileStatusOf(ref.read(myProfileProvider)),
+      state.matchedLocation,
+    ),
     routes: [
       GoRoute(
         path: AppRoutes.splash,
@@ -57,6 +96,25 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.home,
         builder: (context, state) => const HomeScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.profileSetup,
+        builder: (context, state) => const ProfileSetupScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.myProfile,
+        builder: (context, state) => const MyProfileScreen(),
+        routes: [
+          GoRoute(
+            path: 'edit',
+            builder: (context, state) => const EditProfileScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.userProfilePattern,
+        builder: (context, state) =>
+            UserProfileScreen(userId: state.pathParameters['userId']!),
       ),
     ],
   );

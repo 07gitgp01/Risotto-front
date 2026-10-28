@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_health_repository.dart';
+import '../../../core/router/app_routes.dart';
 import '../../auth/application/auth_controller.dart';
+import '../../profile/application/my_profile_controller.dart';
+import '../../profile/presentation/widgets/profile_avatar.dart';
 
-/// Temporary home (milestone 2): greets the user, shows the API status, signs out.
+/// Temporary home: greets the user, links to the profile, shows the API status.
 /// Replaced by the dashboard in milestone 8.
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -15,11 +19,23 @@ class HomeScreen extends ConsumerWidget {
     final auth = ref.watch(authControllerProvider);
     final health = ref.watch(apiHealthProvider);
     final email = auth is Authenticated ? auth.user.email : '';
+    final profile = ref.watch(myProfileProvider).value;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Risotto'),
         actions: [
+          if (profile != null)
+            IconButton(
+              tooltip: 'Mon profil',
+              onPressed: () => context.push(AppRoutes.myProfile),
+              icon: ProfileAvatar(
+                initials: profile.initials,
+                photoUrl: profile.photoUrl,
+                name: profile.fullName,
+                radius: 16,
+              ),
+            ),
           IconButton(
             tooltip: 'Se déconnecter',
             icon: const Icon(Icons.logout),
@@ -37,7 +53,9 @@ class HomeScreen extends ConsumerWidget {
                 Semantics(
                   header: true,
                   child: Text(
-                    'Bienvenue',
+                    profile == null
+                        ? 'Bienvenue'
+                        : 'Bienvenue, ${profile.firstName}',
                     style: theme.textTheme.headlineMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                     ),
