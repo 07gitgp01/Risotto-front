@@ -29,6 +29,16 @@ En debug, le HTTP en clair est autorisé uniquement vers `10.0.2.2`, `localhost`
 - Le token d'accès (15 min) est renouvelé automatiquement ; si la session est révoquée côté serveur, l'application revient à l'écran de connexion.
 - En local, les emails de réinitialisation arrivent dans Mailpit : http://localhost:8025.
 
+## Notifications push (optionnel)
+
+Sans configuration Firebase, l'app fonctionne normalement : notifications in-app en temps réel, push désactivé.
+
+Pour activer le push :
+
+1. Dans le projet Firebase (voir le README de `risotto-back`), télécharger `google-services.json` dans `android/app/` et `GoogleService-Info.plist` dans `ios/Runner/` (les deux sont ignorés par Git).
+2. iOS : activer les capacités *Push Notifications* et *Background Modes > Remote notifications* dans Xcode, et déposer une clé APNs dans la console Firebase.
+3. Lancer avec `flutter run --dart-define=FCM_ENABLED=true`.
+
 ## Qualité
 
 ```bash

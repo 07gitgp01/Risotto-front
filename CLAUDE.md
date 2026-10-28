@@ -64,7 +64,9 @@ flutter build apk --debug
 - Relations : `ConnectionActions` (`connectionActionsProvider`) fait chaque action puis invalide toutes les listes concernées ; `ConnectionButton` affiche l'action selon `MemberConnection` (nom choisi pour éviter le conflit avec `ConnectionState` de Flutter).
 - Temps réel : `realtimeClientProvider` (Socket.IO sur `<hôte API>/ws`, jeton relu à chaque reconnexion, refresh via un appel HTTP si le serveur refuse le jeton) et `realtimeEventsProvider` (flux d'évènements). Toujours remplacé par `FakeRealtimeClient` en test.
 - Messagerie : envoi HTTP, réception WebSocket ; `chatProvider(conversationId)` dédoublonne par id (réponse HTTP + évènement socket).
-- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, health:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:, connections:, messaging:, realtime:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
+- Notifications : `notificationsProvider` (liste tenue à jour par `notification:new`), bandeau in-app global via `scaffoldMessengerKey` (app.dart). Push derrière `PushService` (`DisabledPushService` sauf `--dart-define=FCM_ENABLED=true`) ; `PushRegistration` ne doit pas dépendre de l'état d'auth (cycle Riverpod) : enregistrement déclenché par app.dart à la connexion, désenregistrement par `AuthController.logout()` avant la révocation.
+- Firebase : `google-services.json` / `GoogleService-Info.plist` jamais commités ; le plugin Gradle google-services n'est appliqué que si le fichier existe.
+- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, health:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:, connections:, messaging:, realtime:, notifications:, push:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
 - Faux HTTP pour tester les repositories : `test/helpers/fake_http_adapter.dart`.
 
 ## Jalons
@@ -74,6 +76,6 @@ flutter build apk --debug
 - [x] 4. Contacts et partage (carte de contact, QR code personnel, scan)
 - [x] 5. Mise en relation (recherche, demande, acceptation/refus, blocage)
 - [x] 6. Messagerie (WebSocket, historique paginé, accusés de lecture)
-- [ ] 7. Notifications (temps réel, push FCM, préférences)
+- [x] 7. Notifications (temps réel, push FCM, préférences)
 - [ ] 8. Tableau de bord (demandes en attente, non lus, activité récente)
 - [ ] 9. Finalisation (sécurité, performances, accessibilité, hors ligne)
