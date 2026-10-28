@@ -1,3 +1,5 @@
+import '../../profile/data/profile_models.dart';
+
 /// Business card shared through the personal QR code.
 class ContactCard {
   const ContactCard({
@@ -71,17 +73,22 @@ class ScanResult {
     required this.card,
     required this.isSelf,
     required this.saved,
+    this.connection = const MemberConnection(ConnectionStatus.none),
   });
 
   factory ScanResult.fromJson(Map<String, dynamic> json) => ScanResult(
     card: ContactCard.fromJson(json['card'] as Map<String, dynamic>),
     isSelf: json['isSelf'] as bool,
     saved: json['saved'] as bool,
+    connection: MemberConnection.fromJson(
+      json['connection'] as Map<String, dynamic>?,
+    ),
   );
 
   final ContactCard card;
   final bool isSelf;
   final bool saved;
+  final MemberConnection connection;
 }
 
 class SavedContact {

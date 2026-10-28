@@ -4,6 +4,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/auth/application/auth_controller.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
+import '../../features/connections/presentation/blocked_users_screen.dart';
+import '../../features/connections/presentation/network_screen.dart';
+import '../../features/connections/presentation/search_screen.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
 import '../../features/auth/presentation/reset_password_screen.dart';
@@ -134,6 +137,22 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ),
           ),
         ],
+      ),
+      GoRoute(
+        path: AppRoutes.network,
+        builder: (context, state) => NetworkScreen(
+          initialTab: int.tryParse(state.uri.queryParameters['tab'] ?? '') ?? 0,
+        ),
+        routes: [
+          GoRoute(
+            path: 'blocked',
+            builder: (context, state) => const BlockedUsersScreen(),
+          ),
+        ],
+      ),
+      GoRoute(
+        path: AppRoutes.search,
+        builder: (context, state) => const SearchScreen(),
       ),
       GoRoute(
         path: AppRoutes.userProfilePattern,

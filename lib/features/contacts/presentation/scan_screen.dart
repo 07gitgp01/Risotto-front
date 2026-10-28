@@ -5,6 +5,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../../../core/router/app_routes.dart';
+import '../../connections/application/connections_providers.dart';
+import '../../profile/data/profile_models.dart';
 import '../application/contacts_providers.dart';
 import '../data/contacts_models.dart';
 import '../data/contacts_repository.dart';
@@ -150,7 +152,51 @@ class _ScannedCardSheet extends ConsumerStatefulWidget {
 
 class _ScannedCardSheetState extends ConsumerState<_ScannedCardSheet> {
   late bool _saved = widget.result.saved;
+  late ConnectionStatus _connection = widget.result.connection.status;
   bool _saving = false;
+  bool _connecting = false;
+
+  /// Via the QR payload: works even if the profile is private.
+  Future<void> _connect() async {
+    setState(() => _connecting = true);
+    final messenger = ScaffoldMessenger.of(context);
+    try {
+      final connection = await ref
+          .read(connectionActionsProvider)
+          .request(qrPayload: widget.payload);
+      final accepted = connection.status == 'accepted';
+      if (mounted) {
+        setState(
+          () => _connection = accepted
+              ? ConnectionStatus.connected
+              : ConnectionStatus.pendingOutgoing,
+        );
+      }
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            accepted
+                ? 'Vous êtes maintenant en relation.'
+                : 'Demande de mise en relation envoyée.',
+          ),
+        ),
+      );
+    } on ApiException catch (error) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(
+            error.kind == ApiErrorKind.conflict
+                ? 'Une demande existe déjà ou a été refusée récemment.'
+                : error.message,
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() => _connecting = false);
+      }
+    }
+  }
 
   Future<void> _save() async {
     setState(() => _saving = true);
@@ -186,6 +232,29 @@ class _ScannedCardSheetState extends ConsumerState<_ScannedCardSheet> {
           children: [
             ContactCardView(card: result.card),
             const SizedBox(height: 16),
+            if (!result.isSelf) ...[
+              switch (_connection) {
+                ConnectionStatus.none => FilledButton.icon(
+                  icon: const Icon(Icons.handshake_outlined),
+                  label: const Text('Se connecter'),
+                  onPressed: _connecting ? null : _connect,
+                ),
+                ConnectionStatus.pendingOutgoing => const Text(
+                  'Demande de mise en relation envoyée.',
+                  textAlign: TextAlign.center,
+                ),
+                ConnectionStatus.pendingIncoming => FilledButton.icon(
+                  icon: const Icon(Icons.check),
+                  label: const Text('Accepter sa demande'),
+                  onPressed: _connecting ? null : _connect,
+                ),
+                ConnectionStatus.connected => const Text(
+                  'Vous êtes en relation.',
+                  textAlign: TextAlign.center,
+                ),
+              },
+              const SizedBox(height: 12),
+            ],
             if (result.isSelf)
               const Text(
                 'C’est votre propre QR code.',
@@ -201,7 +270,7 @@ class _ScannedCardSheetState extends ConsumerState<_ScannedCardSheet> {
                 },
               )
             else
-              FilledButton.icon(
+              OutlinedButton.icon(
                 icon: const Icon(Icons.person_add_alt_1),
                 label: const Text('Enregistrer le contact'),
                 onPressed: _saving ? null : _save,

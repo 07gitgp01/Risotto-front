@@ -88,6 +88,16 @@ class HomeScreen extends ConsumerWidget {
                       label: 'Contacts',
                       onTap: () => context.push(AppRoutes.contacts),
                     ),
+                    _HomeAction(
+                      icon: Icons.group_outlined,
+                      label: 'Réseau',
+                      onTap: () => context.push(AppRoutes.network),
+                    ),
+                    _HomeAction(
+                      icon: Icons.person_search,
+                      label: 'Rechercher',
+                      onTap: () => context.push(AppRoutes.search),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 32),

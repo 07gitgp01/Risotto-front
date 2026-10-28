@@ -12,6 +12,9 @@ abstract final class AppRoutes {
   static const myCard = '/card';
   static const scan = '/scan';
   static const contacts = '/contacts';
+  static const network = '/network';
+  static const search = '/search';
+  static const blockedUsers = '/network/blocked';
 
   /// Reachable without a session.
   static const publicRoutes = {login, register, forgotPassword, resetPassword};
