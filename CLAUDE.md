@@ -22,6 +22,8 @@ Langue des échanges : français. Code, commits, noms techniques : anglais.
 | Secondaire | Vert basilic | `#2F6B4F` |
 | Texte | Charbon | `#1F2421` |
 | Alertes | Tomate | `#D6452F` |
+- Teinte dérivée `tomatoDeep` `#B23A26` (= `colorScheme.error`) pour le texte d'erreur et les boutons d'erreur : la tomate n'atteint que 4,1:1 sur crème. La tomate reste pour icônes, bordures, fonds. Le safran ne sert jamais de couleur de texte sur crème (2:1).
+- Les contrastes sont vérifiés par `test/core/theme/risotto_theme_test.dart` (WCAG AA 4.5:1).
 - Boutons safran avec **texte charbon** (lisibilité, contraste ≥ 4.5:1). Jamais de texte blanc sur safran.
 - Toujours passer par `Theme.of(context)` / `RisottoColors`, jamais de couleur en dur dans les widgets.
 - Accessibilité : `Semantics` sur les éléments interactifs sans texte, cibles tactiles ≥ 48 dp, support du text scaling.
@@ -44,14 +46,19 @@ Langue des échanges : français. Code, commits, noms techniques : anglais.
 ## Commandes locales
 ```bash
 flutter pub get
+dart format lib test                # la CI échoue si le code n'est pas formaté
 flutter analyze
 flutter test
-flutter run --dart-define=API_BASE_URL=http://10.0.2.2:3000/api   # émulateur Android
-flutter run --dart-define=API_BASE_URL=http://localhost:3000/api  # simulateur iOS
+flutter run                         # émulateur Android, API par défaut http://10.0.2.2:3000/api
+flutter run --dart-define=API_BASE_URL=http://localhost:3000/api  # simulateur iOS (défaut sur iOS)
+flutter build apk --debug
 ```
+- Identifiants d'application : `com.risotto.risotto` (Android et iOS).
+- Riverpod 3 : `Provider` / `FutureProvider` / `Notifier` ; tests via `ProviderScope(overrides: [...overrideWithValue(fake)])`.
+- Faux HTTP pour tester les repositories : `test/helpers/fake_http_adapter.dart`.
 
 ## Jalons
-- [ ] 1. Fondations (structure, CI, configuration, thème Risotto)
+- [x] 1. Fondations (structure, CI, configuration, thème Risotto)
 - [ ] 2. Authentification (écrans inscription, connexion, mot de passe oublié, refresh, déconnexion)
 - [ ] 3. Profil (création, édition, photo, visibilité)
 - [ ] 4. Contacts et partage (carte de contact, QR code personnel, scan)
