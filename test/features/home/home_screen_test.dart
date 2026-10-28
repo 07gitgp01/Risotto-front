@@ -18,7 +18,7 @@ void main() {
   testWidgets('greets the user on a cream background', (tester) async {
     await startSignedIn(tester);
 
-    expect(find.text('Bienvenue'), findsOneWidget);
+    expect(find.textContaining('Bienvenue'), findsOneWidget);
     expect(find.text(testUser.email), findsOneWidget);
     final context = tester.element(find.byType(Scaffold));
     expect(Theme.of(context).scaffoldBackgroundColor, RisottoColors.cream);

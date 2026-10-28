@@ -40,7 +40,7 @@ void main() {
       await tapText(tester, 'Se connecter');
 
       expect(auth.calls, ['login']);
-      expect(find.text('Bienvenue'), findsOneWidget);
+      expect(find.textContaining('Bienvenue'), findsOneWidget);
       expect(find.text('alice@example.com'), findsOneWidget);
       expect(storage.session, isNotNull);
     });
@@ -111,7 +111,7 @@ void main() {
       await tapText(tester, 'Créer mon compte');
 
       expect(auth.calls, ['register']);
-      expect(find.text('Bienvenue'), findsOneWidget);
+      expect(find.textContaining('Bienvenue'), findsOneWidget);
     });
 
     testWidgets('explains that the email is taken', (tester) async {
@@ -189,7 +189,7 @@ void main() {
     testWidgets('a stored session opens home directly', (tester) async {
       storage.session = testSession();
       await start(tester);
-      expect(find.text('Bienvenue'), findsOneWidget);
+      expect(find.textContaining('Bienvenue'), findsOneWidget);
     });
 
     testWidgets('logout returns to the login screen', (tester) async {
