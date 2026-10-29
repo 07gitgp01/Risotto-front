@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../core/router/open_route.dart';
 import '../../messaging/presentation/time_format.dart';
 import '../../profile/presentation/widgets/profile_avatar.dart';
 import '../application/notifications_providers.dart';
 import 'notification_routes.dart';
+import '../../../core/widgets/risotto_ui.dart';
 
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
@@ -34,7 +36,7 @@ class NotificationsScreen extends ConsumerWidget {
         ],
       ),
       body: notifications.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const PageLoading(),
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -115,7 +117,7 @@ class NotificationsScreen extends ConsumerWidget {
                           notification.data,
                         );
                         if (route != null) {
-                          context.push(route);
+                          openRoute(GoRouter.of(context), route);
                         }
                       },
                     );

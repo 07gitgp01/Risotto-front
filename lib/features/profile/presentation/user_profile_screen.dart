@@ -10,6 +10,7 @@ import '../../messaging/data/messaging_repository.dart';
 import '../application/my_profile_controller.dart';
 import '../data/profile_models.dart';
 import 'widgets/profile_details.dart';
+import '../../../core/widgets/risotto_ui.dart';
 
 /// Another member's profile, as much as their visibility allows.
 class UserProfileScreen extends ConsumerWidget {
@@ -97,7 +98,7 @@ class UserProfileScreen extends ConsumerWidget {
         ],
       ),
       body: profile.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const PageLoading(),
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),

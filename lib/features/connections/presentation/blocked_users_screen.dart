@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../application/connections_providers.dart';
+import '../../../core/widgets/risotto_ui.dart';
 
 class BlockedUsersScreen extends ConsumerWidget {
   const BlockedUsersScreen({super.key});
@@ -13,7 +14,7 @@ class BlockedUsersScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Membres bloqués')),
       body: blocked.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const PageLoading(),
         error: (error, _) => Center(
           child: Text(
             error is ApiException ? error.message : 'Liste indisponible.',

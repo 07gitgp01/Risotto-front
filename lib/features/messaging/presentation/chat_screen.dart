@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/router/app_routes.dart';
+import '../../../core/widgets/risotto_ui.dart';
 import '../../auth/application/auth_controller.dart';
+import '../../profile/presentation/widgets/profile_avatar.dart';
 import '../application/messaging_providers.dart';
 import '../data/messaging_models.dart';
 import 'time_format.dart';
@@ -80,10 +84,11 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(chat.value?.conversation.user.fullName ?? 'Conversation'),
       ),
       body: chat.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const PageLoading(),
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -107,8 +112,38 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
               state.otherLastReadAt != null &&
               !state.otherLastReadAt!.isBefore(lastMine.createdAt);
 
+          final user = state.conversation.user;
           return Column(
             children: [
+              // Who I am talking to (design: chat header card).
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+                child: SurfaceCard(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  onTap: () => context.push(AppRoutes.userProfile(user.userId)),
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: ProfileAvatar(
+                      initials: user.initials,
+                      photoUrl: user.photoUrl,
+                      name: user.fullName,
+                      radius: 24,
+                    ),
+                    title: Text(user.fullName),
+                    subtitle: user.position == null && user.headline == null
+                        ? null
+                        : Text(
+                            user.position ?? user.headline!,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                    trailing: const Icon(Icons.chevron_right),
+                  ),
+                ),
+              ),
               Expanded(
                 child: state.messages.isEmpty
                     ? const Center(
@@ -133,7 +168,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           if (index == state.messages.length) {
                             return const Padding(
                               padding: EdgeInsets.all(12),
-                              child: Center(child: CircularProgressIndicator()),
+                              child: PageLoading(),
                             );
                           }
                           final message = state.messages[index];
@@ -182,8 +217,9 @@ class _Bubble extends StatelessWidget {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     // Mine: basil with white text; theirs: light card with charcoal text.
-    final background = mine ? colors.secondary : colors.surfaceContainerLowest;
-    final foreground = mine ? colors.onSecondary : colors.onSurface;
+    // Design: mine in saffron with charcoal text, theirs on white cards.
+    final background = mine ? colors.primary : colors.surfaceContainerLowest;
+    final foreground = mine ? colors.onPrimary : colors.onSurface;
     // One coherent sentence for screen readers instead of separate fragments.
     final spoken = [
       mine ? 'Vous' : 'Message reçu',
@@ -281,16 +317,36 @@ class _Composer extends StatelessWidget {
                 maxLines: 5,
                 maxLength: 4000,
                 textCapitalization: TextCapitalization.sentences,
-                decoration: const InputDecoration(
-                  hintText: 'Votre message',
+                decoration: InputDecoration(
+                  hintText: 'Votre message…',
                   counterText: '',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(28),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(28),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(28),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).colorScheme.secondary,
+                      width: 2,
+                    ),
+                  ),
                 ),
               ),
             ),
-            const SizedBox(width: 4),
+            const SizedBox(width: 8),
             IconButton.filled(
               tooltip: 'Envoyer',
               onPressed: sending ? null : onSend,
+              style: IconButton.styleFrom(
+                minimumSize: const Size(52, 52),
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+              ),
               icon: const Icon(Icons.send),
             ),
           ],

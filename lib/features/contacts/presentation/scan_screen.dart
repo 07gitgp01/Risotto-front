@@ -11,6 +11,7 @@ import '../application/contacts_providers.dart';
 import '../data/contacts_models.dart';
 import '../data/contacts_repository.dart';
 import 'widgets/contact_card_view.dart';
+import '../../../core/widgets/risotto_ui.dart';
 
 /// Builds the camera view; calls [onPayload] for every decoded QR code.
 /// Replaced by a fake in widget tests (no camera there).
@@ -133,7 +134,7 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
               ),
             ),
           ),
-          if (_busy) const Center(child: CircularProgressIndicator()),
+          if (_busy) const PageLoading(),
         ],
       ),
     );

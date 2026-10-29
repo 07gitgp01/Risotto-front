@@ -149,6 +149,25 @@ class ProfileInput {
     this.sharePhone,
   });
 
+  /// The current values of [profile], with optional changes to the settings.
+  factory ProfileInput.fromProfile(
+    Profile profile, {
+    ProfileVisibility? visibility,
+  }) => ProfileInput(
+    firstName: profile.firstName,
+    lastName: profile.lastName,
+    headline: profile.headline ?? '',
+    jobTitle: profile.jobTitle ?? '',
+    company: profile.company ?? '',
+    bio: profile.bio ?? '',
+    location: profile.location ?? '',
+    phone: profile.phone ?? '',
+    website: profile.website ?? '',
+    visibility: visibility ?? profile.visibility,
+    shareEmail: profile.shareEmail,
+    sharePhone: profile.sharePhone,
+  );
+
   final String firstName;
   final String lastName;
   final String headline;

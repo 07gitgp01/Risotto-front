@@ -7,6 +7,7 @@ import '../../auth/presentation/widgets/auth_form_scaffold.dart';
 import '../application/my_profile_controller.dart';
 import '../application/profile_validators.dart';
 import '../data/profile_models.dart';
+import '../../../core/widgets/risotto_ui.dart';
 
 class EditProfileScreen extends ConsumerWidget {
   const EditProfileScreen({super.key});
@@ -17,7 +18,7 @@ class EditProfileScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Modifier le profil')),
       body: profile == null
-          ? const Center(child: CircularProgressIndicator())
+          ? const PageLoading()
           : _EditProfileForm(profile: profile),
     );
   }

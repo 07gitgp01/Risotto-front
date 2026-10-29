@@ -4,13 +4,17 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../core/theme/risotto_colors.dart';
+import '../../../core/theme/risotto_theme.dart';
+import '../../../core/widgets/risotto_ui.dart';
 import '../../profile/data/profile_models.dart';
+import '../../shell/main_app_bar.dart';
 import '../application/connections_providers.dart';
 import '../data/connections_models.dart';
 import 'widgets/connection_button.dart';
 import 'widgets/member_tile.dart';
 
-/// My connections and the pending requests, in three tabs.
+/// Réseau tab (design: r_seau): search, my connections and pending requests.
 class NetworkScreen extends ConsumerWidget {
   const NetworkScreen({this.initialTab = 0, super.key});
 
@@ -21,52 +25,104 @@ class NetworkScreen extends ConsumerWidget {
     final incoming = ref
         .watch(connectionRequestsProvider(RequestDirection.incoming))
         .value;
+    final connections = ref.watch(myConnectionsProvider).value;
     return DefaultTabController(
       length: 3,
       initialIndex: initialTab,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Mon réseau'),
+        appBar: MainAppBar(
+          title: 'Réseau',
           actions: [
-            IconButton(
-              tooltip: 'Rechercher un membre',
-              icon: const Icon(Icons.person_search),
-              onPressed: () => context.push(AppRoutes.search),
-            ),
             PopupMenuButton<String>(
               tooltip: 'Plus d’options',
-              onSelected: (_) => context.push(AppRoutes.blockedUsers),
+              onSelected: (route) => context.push(route),
               itemBuilder: (context) => const [
-                PopupMenuItem(value: 'blocked', child: Text('Membres bloqués')),
+                PopupMenuItem(
+                  value: AppRoutes.contacts,
+                  child: Text('Mes contacts'),
+                ),
+                PopupMenuItem(
+                  value: AppRoutes.blockedUsers,
+                  child: Text('Membres bloqués'),
+                ),
               ],
             ),
           ],
-          bottom: TabBar(
-            tabs: [
-              const Tab(text: 'Relations'),
-              Tab(
-                text: incoming == null || incoming.isEmpty
-                    ? 'Reçues'
-                    : 'Reçues (${incoming.length})',
-              ),
-              const Tab(text: 'Envoyées'),
-            ],
-          ),
         ),
-        body: TabBarView(
+        body: Column(
           children: [
-            _ConnectionList(
-              provider: myConnectionsProvider,
-              empty:
-                  'Pas encore de relations.\nRecherchez un membre ou scannez son QR code.',
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+              child: Semantics(
+                button: true,
+                label: 'Rechercher un membre',
+                excludeSemantics: true,
+                child: TextField(
+                  readOnly: true,
+                  onTap: () => context.push(AppRoutes.search),
+                  decoration: const InputDecoration(
+                    hintText: 'Rechercher par nom, métier ou entreprise',
+                    prefixIcon: Icon(Icons.search),
+                  ),
+                ),
+              ),
             ),
-            _ConnectionList(
-              provider: connectionRequestsProvider(RequestDirection.incoming),
-              empty: 'Aucune demande reçue.',
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: RisottoColors.creamDark,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                padding: const EdgeInsets.all(4),
+                child: TabBar(
+                  indicator: BoxDecoration(
+                    color: RisottoColors.white,
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: risottoCardShadow,
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  dividerColor: Colors.transparent,
+                  labelPadding: EdgeInsets.zero,
+                  tabs: [
+                    Tab(
+                      text: connections == null || connections.isEmpty
+                          ? 'Relations'
+                          : 'Relations (${connections.length})',
+                    ),
+                    Tab(
+                      text: incoming == null || incoming.isEmpty
+                          ? 'Demandes'
+                          : 'Demandes (${incoming.length})',
+                    ),
+                    const Tab(text: 'Envoyées'),
+                  ],
+                ),
+              ),
             ),
-            _ConnectionList(
-              provider: connectionRequestsProvider(RequestDirection.outgoing),
-              empty: 'Aucune demande en attente.',
+            const SizedBox(height: 8),
+            Expanded(
+              child: TabBarView(
+                children: [
+                  _ConnectionList(
+                    provider: myConnectionsProvider,
+                    empty:
+                        'Pas encore de relations.\nRecherchez un membre ou scannez son QR code.',
+                  ),
+                  _ConnectionList(
+                    provider: connectionRequestsProvider(
+                      RequestDirection.incoming,
+                    ),
+                    empty: 'À jour ! Vous n’avez pas de demande en attente.',
+                  ),
+                  _ConnectionList(
+                    provider: connectionRequestsProvider(
+                      RequestDirection.outgoing,
+                    ),
+                    empty: 'Aucune demande envoyée en attente.',
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -86,7 +142,7 @@ class _ConnectionList extends ConsumerWidget {
     return ref
         .watch(provider)
         .when(
-          loading: () => const Center(child: CircularProgressIndicator()),
+          loading: () => const PageLoading(),
           error: (error, _) => Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -118,8 +174,9 @@ class _ConnectionList extends ConsumerWidget {
               : RefreshIndicator(
                   onRefresh: () => ref.refresh(provider.future),
                   child: ListView.separated(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
                     itemCount: connections.length,
-                    separatorBuilder: (_, _) => const Divider(height: 1),
+                    separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
                       final connection = connections[index];
                       final state = MemberConnection(
@@ -130,30 +187,33 @@ class _ConnectionList extends ConsumerWidget {
                             : ConnectionStatus.pendingOutgoing,
                         connection.id,
                       );
-                      return MemberTile(
-                        profile: connection.user,
-                        below: connection.status == 'accepted'
-                            ? null
-                            : Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  if (connection.message != null) ...[
-                                    Text(
-                                      '« ${connection.message} »',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium,
+                      return SurfaceCard(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: MemberTile(
+                          profile: connection.user,
+                          below: connection.status == 'accepted'
+                              ? null
+                              : Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (connection.message != null) ...[
+                                      Text(
+                                        '« ${connection.message} »',
+                                        style: Theme.of(
+                                          context,
+                                        ).textTheme.bodyMedium,
+                                      ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                    ConnectionButton(
+                                      userId: connection.user.userId,
+                                      name: connection.user.firstName,
+                                      state: state,
+                                      compact: true,
                                     ),
-                                    const SizedBox(height: 8),
                                   ],
-                                  ConnectionButton(
-                                    userId: connection.user.userId,
-                                    name: connection.user.firstName,
-                                    state: state,
-                                    compact: true,
-                                  ),
-                                ],
-                              ),
+                                ),
+                        ),
                       );
                     },
                   ),

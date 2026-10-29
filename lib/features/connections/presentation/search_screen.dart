@@ -7,6 +7,7 @@ import '../../../core/network/api_exception.dart';
 import '../application/connections_providers.dart';
 import 'widgets/connection_button.dart';
 import 'widgets/member_tile.dart';
+import '../../../core/widgets/risotto_ui.dart';
 
 class SearchScreen extends ConsumerStatefulWidget {
   const SearchScreen({super.key});
@@ -61,8 +62,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
             child: _query.length < 2
                 ? const _Hint('Saisissez au moins 2 caractères.')
                 : results.when(
-                    loading: () =>
-                        const Center(child: CircularProgressIndicator()),
+                    loading: () => const PageLoading(),
                     error: (error, _) => _Hint(
                       error is ApiException
                           ? error.message

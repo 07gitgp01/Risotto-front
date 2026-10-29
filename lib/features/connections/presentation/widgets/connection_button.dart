@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/network/api_exception.dart';
+import '../../../../core/theme/risotto_colors.dart';
 import '../../../profile/data/profile_models.dart';
 import '../../application/connections_providers.dart';
 
@@ -118,23 +119,41 @@ class _ConnectionButtonState extends ConsumerState<ConnectionButton> {
           ),
         );
       case ConnectionStatus.pendingIncoming:
-        final accept = primary(
-          'Accepter',
-          Icons.check,
-          () => _run(
-            () => actions.accept(id!, widget.userId),
-            'Vous êtes maintenant en relation avec ${widget.name}.',
+        // Design: "Refuser" neutral, "Accepter" basil, side by side.
+        final decline = FilledButton(
+          onPressed: onBusy == null
+              ? null
+              : () => _run(
+                  () => actions.decline(id!, widget.userId),
+                  'Demande refusée.',
+                ),
+          style: FilledButton.styleFrom(
+            backgroundColor: RisottoColors.creamDark,
+            foregroundColor: RisottoColors.charcoal,
           ),
+          child: const Text('Refuser'),
         );
-        final decline = secondary(
-          'Refuser',
-          Icons.close,
-          () => _run(
-            () => actions.decline(id!, widget.userId),
-            'Demande refusée.',
+        final accept = FilledButton.icon(
+          onPressed: onBusy == null
+              ? null
+              : () => _run(
+                  () => actions.accept(id!, widget.userId),
+                  'Vous êtes maintenant en relation avec ${widget.name}.',
+                ),
+          style: FilledButton.styleFrom(
+            backgroundColor: RisottoColors.basil,
+            foregroundColor: RisottoColors.white,
           ),
+          icon: const Icon(Icons.check),
+          label: const Text('Accepter'),
         );
-        return Wrap(spacing: 8, runSpacing: 8, children: [accept, decline]);
+        return Row(
+          children: [
+            Expanded(child: decline),
+            const SizedBox(width: 12),
+            Expanded(child: accept),
+          ],
+        );
       case ConnectionStatus.connected:
         return secondary('En relation', Icons.how_to_reg, () async {
           if (await _confirm(

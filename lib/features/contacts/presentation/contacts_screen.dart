@@ -6,6 +6,7 @@ import '../../../core/network/api_exception.dart';
 import '../../../core/router/app_routes.dart';
 import '../../profile/presentation/widgets/profile_avatar.dart';
 import '../application/contacts_providers.dart';
+import '../../../core/widgets/risotto_ui.dart';
 
 class ContactsScreen extends ConsumerWidget {
   const ContactsScreen({super.key});
@@ -21,7 +22,7 @@ class ContactsScreen extends ConsumerWidget {
         label: const Text('Scanner'),
       ),
       body: contacts.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const PageLoading(),
         error: (error, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),

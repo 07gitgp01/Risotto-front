@@ -5,6 +5,7 @@ import '../../../core/network/api_exception.dart';
 import '../application/notifications_providers.dart';
 import '../application/push_service.dart';
 import '../data/notifications_models.dart';
+import '../../../core/widgets/risotto_ui.dart';
 
 class NotificationSettingsScreen extends ConsumerWidget {
   const NotificationSettingsScreen({super.key});
@@ -31,7 +32,7 @@ class NotificationSettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Préférences de notification')),
       body: preferences.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const PageLoading(),
         error: (error, _) => Center(
           child: Text(
             error is ApiException
