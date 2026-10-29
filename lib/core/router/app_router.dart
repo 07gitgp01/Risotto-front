@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/admin/presentation/admin_screen.dart';
 import '../../features/auth/application/auth_controller.dart';
 import '../../features/auth/presentation/forgot_password_screen.dart';
 import '../../features/connections/presentation/blocked_users_screen.dart';
@@ -47,7 +48,11 @@ String? appRedirect(AuthState auth, ProfileStatus profile, String location) {
       return location == AppRoutes.splash ? null : AppRoutes.splash;
     case Unauthenticated():
       return isPublic ? null : AppRoutes.welcome;
-    case Authenticated():
+    case Authenticated(:final user):
+      // Cosmetic only: the API refuses every admin call to a member anyway.
+      if (location == AppRoutes.admin && !user.isAdmin) {
+        return AppRoutes.home;
+      }
       if (profile == ProfileStatus.missing) {
         return location == AppRoutes.profileSetup
             ? null
@@ -198,6 +203,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const NotificationSettingsScreen(),
           ),
         ],
+      ),
+      GoRoute(
+        path: AppRoutes.admin,
+        builder: (context, state) => const AdminScreen(),
       ),
       GoRoute(
         path: AppRoutes.search,

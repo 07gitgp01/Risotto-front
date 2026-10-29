@@ -19,6 +19,7 @@ abstract final class AppRoutes {
   static const messages = '/messages';
   static const notifications = '/notifications';
   static const notificationSettings = '/notifications/settings';
+  static const admin = '/admin';
 
   /// Reachable without a session.
   static const publicRoutes = {

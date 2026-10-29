@@ -211,6 +211,34 @@ class MyProfileScreen extends ConsumerWidget {
                   _LinksCard(profile: profile),
                   const SizedBox(height: 12),
                   const _ActionsRow(),
+                  if (switch (ref.watch(authControllerProvider)) {
+                    Authenticated(:final user) => user.isAdmin,
+                    _ => false,
+                  }) ...[
+                    const SizedBox(height: 12),
+                    SurfaceCard(
+                      onTap: () => context.push(AppRoutes.admin),
+                      child: const Row(
+                        children: [
+                          IconTile(
+                            Icons.admin_panel_settings_outlined,
+                            tone: PillTone.saffron,
+                          ),
+                          SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Administration'),
+                                Text('Statistiques et gestion des comptes'),
+                              ],
+                            ),
+                          ),
+                          Icon(Icons.arrow_forward),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
                   OutlinedButton.icon(
                     icon: const Icon(Icons.logout),
