@@ -60,6 +60,8 @@ flutter test
 flutter run                         # émulateur Android, API par défaut http://10.0.2.2:3000/api
 flutter run --dart-define=API_BASE_URL=http://localhost:3000/api  # simulateur iOS (défaut sur iOS)
 flutter build apk --debug
+# Téléphone réel en USB : adb reverse tcp:3000 tcp:3000, puis
+flutter build apk --debug --dart-define=API_BASE_URL=http://127.0.0.1:3000/api
 ```
 - Identifiants d'application : `com.risotto.risotto` (Android et iOS).
 - Riverpod 3 : `Provider` / `FutureProvider` / `Notifier` ; tests via `ProviderScope(overrides: [...overrideWithValue(fake)])`.
@@ -79,6 +81,7 @@ flutter build apk --debug
 - Accessibilité : bulles de chat lues en une phrase (`Semantics(excludeSemantics)`), tests de grandes polices (`textScaleFactorTestValue = 2`) et des guidelines Flutter sur les écrans principaux.
 - Android : `allowBackup=false` + `data_extraction_rules.xml` (jetons et cache jamais sauvegardés ni transférés).
 - Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:, connections:, messaging:, realtime:, notifications:, push:, dashboard:, responseCache:)` ; navigation : `openLogin`, `openTab(tester, 'Messages')`, `openMyCard`, `openSearch`, `openContacts`, `signOut`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
+- Administration (`lib/features/admin/`, route `/admin`, entrée « Administration » dans l'onglet Profil) : visible seulement si `AuthUser.isAdmin` (champ `role` de l'API, conservé dans la session). Ce n'est que de l'affichage : l'API revérifie le rôle à chaque appel. Login refusé en 403 = compte suspendu (message dédié). En test : `FakeAdminRepository` (`test/helpers/fake_admin.dart`) via `extraOverrides`.
 - Faux HTTP pour tester les repositories : `test/helpers/fake_http_adapter.dart`.
 
 ## Jalons
