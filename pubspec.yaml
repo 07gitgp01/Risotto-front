@@ -72,6 +72,21 @@ flutter:
   assets:
     - assets/brand/png/
 
+  # Plus Jakarta Sans (design system typography), bundled: no network fetch at runtime.
+  fonts:
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/plus_jakarta_sans/PlusJakartaSans-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/plus_jakarta_sans/PlusJakartaSans-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/plus_jakarta_sans/PlusJakartaSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/plus_jakarta_sans/PlusJakartaSans-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/plus_jakarta_sans/PlusJakartaSans-ExtraBold.ttf
+          weight: 800
+
 # App icon, from the brand kit (assets/brand/README.md). Regenerate with:
 #   dart run flutter_launcher_icons
 flutter_launcher_icons:
