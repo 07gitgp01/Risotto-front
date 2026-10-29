@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -25,6 +25,8 @@ import '../../features/profile/presentation/edit_profile_screen.dart';
 import '../../features/profile/presentation/my_profile_screen.dart';
 import '../../features/profile/presentation/profile_setup_screen.dart';
 import '../../features/profile/presentation/user_profile_screen.dart';
+import '../../features/auth/presentation/welcome_screen.dart';
+import '../../features/shell/app_shell.dart';
 import 'app_routes.dart';
 
 /// Whether the signed-in user already has a profile. `unknown` while loading or
@@ -44,7 +46,7 @@ String? appRedirect(AuthState auth, ProfileStatus profile, String location) {
     case AuthUnknown():
       return location == AppRoutes.splash ? null : AppRoutes.splash;
     case Unauthenticated():
-      return isPublic ? null : AppRoutes.login;
+      return isPublic ? null : AppRoutes.welcome;
     case Authenticated():
       if (profile == ProfileStatus.missing) {
         return location == AppRoutes.profileSetup
@@ -88,6 +90,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const SplashScreen(),
       ),
       GoRoute(
+        path: AppRoutes.welcome,
+        builder: (context, state) => const WelcomeScreen(),
+      ),
+      GoRoute(
         path: AppRoutes.login,
         builder: (context, state) => const LoginScreen(),
       ),
@@ -105,22 +111,63 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             ResetPasswordScreen(email: state.uri.queryParameters['email']),
       ),
       GoRoute(
-        path: AppRoutes.home,
-        builder: (context, state) => const HomeScreen(),
-      ),
-      GoRoute(
         path: AppRoutes.profileSetup,
         builder: (context, state) => const ProfileSetupScreen(),
       ),
-      GoRoute(
-        path: AppRoutes.myProfile,
-        builder: (context, state) => const MyProfileScreen(),
-        routes: [
-          GoRoute(
-            path: 'edit',
-            builder: (context, state) => const EditProfileScreen(),
+      // Main tabs, each with its own navigation stack, under the bottom bar.
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, shell) => AppShell(shell: shell),
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.home,
+                builder: (context, state) => const HomeScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.network,
+                builder: (context, state) => NetworkScreen(
+                  initialTab:
+                      int.tryParse(state.uri.queryParameters['tab'] ?? '') ?? 0,
+                ),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.messages,
+                builder: (context, state) => const ConversationsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: AppRoutes.myProfile,
+                builder: (context, state) => const MyProfileScreen(),
+              ),
+            ],
           ),
         ],
+      ),
+      // Full-screen pages, opened above the tabs.
+      GoRoute(
+        path: AppRoutes.editProfile,
+        builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: '${AppRoutes.messages}/:conversationId',
+        builder: (context, state) =>
+            ChatScreen(conversationId: state.pathParameters['conversationId']!),
+      ),
+      GoRoute(
+        path: AppRoutes.blockedUsers,
+        builder: (context, state) => const BlockedUsersScreen(),
       ),
       GoRoute(
         path: AppRoutes.myCard,
@@ -138,30 +185,6 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: ':contactId',
             builder: (context, state) => ContactDetailScreen(
               contactId: state.pathParameters['contactId']!,
-            ),
-          ),
-        ],
-      ),
-      GoRoute(
-        path: AppRoutes.network,
-        builder: (context, state) => NetworkScreen(
-          initialTab: int.tryParse(state.uri.queryParameters['tab'] ?? '') ?? 0,
-        ),
-        routes: [
-          GoRoute(
-            path: 'blocked',
-            builder: (context, state) => const BlockedUsersScreen(),
-          ),
-        ],
-      ),
-      GoRoute(
-        path: AppRoutes.messages,
-        builder: (context, state) => const ConversationsScreen(),
-        routes: [
-          GoRoute(
-            path: ':conversationId',
-            builder: (context, state) => ChatScreen(
-              conversationId: state.pathParameters['conversationId']!,
             ),
           ),
         ],

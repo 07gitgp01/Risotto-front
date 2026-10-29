@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'core/offline/connectivity.dart';
 import 'core/router/app_router.dart';
+import 'core/router/open_route.dart';
 import 'core/theme/risotto_theme.dart';
 import 'features/auth/application/auth_controller.dart';
 import 'features/dashboard/application/dashboard_provider.dart';
@@ -41,7 +42,7 @@ class _RisottoAppState extends ConsumerState<RisottoApp> {
     ) {
       final route = routeForPushData(data);
       if (route != null) {
-        unawaited(ref.read(appRouterProvider).push(route));
+        openRoute(ref.read(appRouterProvider), route);
       }
     });
   }
@@ -69,7 +70,7 @@ class _RisottoAppState extends ConsumerState<RisottoApp> {
               : SnackBarAction(
                   label: 'Voir',
                   onPressed: () =>
-                      unawaited(ref.read(appRouterProvider).push(route)),
+                      openRoute(ref.read(appRouterProvider), route),
                 ),
         ),
       );
