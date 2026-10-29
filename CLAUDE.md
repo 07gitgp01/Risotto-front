@@ -26,7 +26,12 @@ Langue des échanges : français. Code, commits, noms techniques : anglais.
 - Les contrastes sont vérifiés par `test/core/theme/risotto_theme_test.dart` (WCAG AA 4.5:1).
 - Kit de marque (logo « La rencontre ») dans `assets/brand/` (sources SVG, exports PNG, README du kit) ; seul `assets/brand/png/` est embarqué dans l'app. Maquettes de référence (Stitch) dans `design/<écran>/` (`screen.png`, `code.html`, `risotto/DESIGN.md`) : non embarquées.
 - Icône d'app et écran de démarrage générés depuis le kit (config dans `pubspec.yaml`) : `dart run flutter_launcher_icons` puis `dart run flutter_native_splash:create` après toute modification du kit. Ne jamais retoucher à la main les fichiers générés dans `android/` et `ios/`.
-- Chargement plein écran : `RisottoLoader` (`lib/core/widgets/`), pas de `CircularProgressIndicator` nu.
+- Chargement plein écran : `RisottoLoader` (`lib/core/widgets/`), pas de `CircularProgressIndicator` nu (`PageLoading` pour un écran).
+- Design system (`design/risotto/DESIGN.md`) : police Plus Jakarta Sans embarquée (`assets/fonts/`, licence OFL), cartes blanches 16 px avec ombre légère sur fond crème (`SurfaceCard`), boutons en pilule, champs blancs bordés `#E6DECA`, badges `StatusPill`, tuiles `IconTile`, panneaux `InfoPanel` / `TipCard` (`lib/core/widgets/risotto_ui.dart`). La palette Material du YAML de la maquette n'est pas utilisée : on garde la charte (texte de la maquette).
+- Jamais de safran comme couleur de petit texte (2:1) : libellés de champ actifs et curseur en basilic.
+- Navigation : 4 onglets (`StatefulShellRoute`, `lib/features/shell/app_shell.dart`) Accueil · Réseau · Messages · Profil, bouton central « Ma carte ». Les autres pages s'ouvrent par-dessus (`context.push`). Pour ouvrir un onglet, `context.go` (ou `openRoute()`), jamais `push` (page en double dans la pile). Barre d'app des onglets : `MainAppBar` (logo, cloche, avatar).
+- Déconnecté, l'app ouvre l'écran de bienvenue (`/welcome`), puis connexion ou inscription.
+- Ne pas reprendre les textes de la maquette qui promettent ce que l'app ne fait pas (chiffrement de bout en bout, NFC, connexion Google/SMS, relations en commun).
 - Boutons safran avec **texte charbon** (lisibilité, contraste ≥ 4.5:1). Jamais de texte blanc sur safran.
 - Toujours passer par `Theme.of(context)` / `RisottoColors`, jamais de couleur en dur dans les widgets.
 - Accessibilité : `Semantics` sur les éléments interactifs sans texte, cibles tactiles ≥ 48 dp, support du text scaling.
@@ -73,7 +78,7 @@ flutter build apk --debug
 - Hors ligne : `OfflineInterceptor` (dio) mémorise les GET des écrans principaux par utilisateur (`ResponseCache`, fichier privé) et les rejoue en cas d'erreur réseau ; `offlineProvider` pilote le bandeau global (app.dart). Cache vidé par `AuthController` à la déconnexion. Pas de file d'attente d'envoi.
 - Accessibilité : bulles de chat lues en une phrase (`Semantics(excludeSemantics)`), tests de grandes polices (`textScaleFactorTestValue = 2`) et des guidelines Flutter sur les écrans principaux.
 - Android : `allowBackup=false` + `data_extraction_rules.xml` (jetons et cache jamais sauvegardés ni transférés).
-- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:, connections:, messaging:, realtime:, notifications:, push:, dashboard:, responseCache:)`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
+- Tests de widgets : `pumpRisottoApp(tester, auth:, storage:, profiles:, photoPicker:, contacts:, cardSharer:, scannerPayloads:, connections:, messaging:, realtime:, notifications:, push:, dashboard:, responseCache:)` ; navigation : `openLogin`, `openTab(tester, 'Messages')`, `openMyCard`, `openSearch`, `openContacts`, `signOut`, `enterField`, `tapText` (font défiler la liste de la page, vers le bas uniquement : remplir les champs dans l'ordre de l'écran) dans `test/helpers/`.
 - Faux HTTP pour tester les repositories : `test/helpers/fake_http_adapter.dart`.
 
 ## Jalons
