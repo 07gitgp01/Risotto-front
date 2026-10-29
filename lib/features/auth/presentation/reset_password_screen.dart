@@ -83,6 +83,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return AuthFormScaffold(
+      appBarTitle: 'Mot de passe',
       title: 'Nouveau mot de passe',
       subtitle:
           'Saisissez le code reçu par email. Il est valable 30 minutes. '
@@ -101,7 +102,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                 textInputAction: TextInputAction.next,
                 autocorrect: false,
                 validator: AuthValidators.email,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: Icon(Icons.alternate_email),
+                ),
               ),
               const SizedBox(height: 16),
               TextFormField(

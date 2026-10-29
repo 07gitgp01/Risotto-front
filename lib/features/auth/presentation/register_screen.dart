@@ -62,8 +62,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return AuthFormScaffold(
+      appBarTitle: 'Inscription',
       title: 'Créer un compte',
-      subtitle: 'Quelques secondes pour rejoindre Risotto.',
+      subtitle:
+          'Quelques secondes pour rejoindre le réseau et partager votre carte.',
       child: AutofillGroup(
         child: Form(
           key: _formKey,
@@ -77,7 +79,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 textInputAction: TextInputAction.next,
                 autocorrect: false,
                 validator: AuthValidators.email,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: Icon(Icons.alternate_email),
+                ),
               ),
               const SizedBox(height: 16),
               PasswordField(

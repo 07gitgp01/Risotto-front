@@ -1,49 +1,106 @@
 import 'package:flutter/material.dart';
 
-/// Common layout of the auth screens: title, subtitle, form, centred and scrollable.
+import '../../../../core/theme/risotto_colors.dart';
+import '../../../../core/widgets/risotto_ui.dart';
+
+/// Common layout of the auth screens (design: connexion / inscription): logo,
+/// centred title and subtitle, the form in a white card on the cream canvas.
 class AuthFormScaffold extends StatelessWidget {
   const AuthFormScaffold({
     required this.title,
     required this.child,
     this.subtitle,
+    this.appBarTitle,
     this.showBackButton = false,
+    this.footer,
     super.key,
   });
 
   final String title;
   final String? subtitle;
   final Widget child;
+
+  /// Short screen name next to the logo (e.g. "Connexion").
+  final String? appBarTitle;
   final bool showBackButton;
+
+  /// Below the card (e.g. "Créer un compte" link).
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Scaffold(
-      appBar: showBackButton ? AppBar() : null,
+      appBar: AppBar(
+        automaticallyImplyLeading: showBackButton,
+        title: Row(
+          children: [
+            const RisottoLogo(size: 28),
+            if (appBarTitle != null) ...[
+              const SizedBox(width: 12),
+              Flexible(child: Text(appBarTitle!)),
+            ],
+          ],
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
             child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 440),
+              constraints: const BoxConstraints(maxWidth: 480),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Semantics(
-                    header: true,
-                    child: Text(
-                      title,
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+                  SurfaceCard(
+                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Center(child: _LogoBadge()),
+                        const SizedBox(height: 16),
+                        Semantics(
+                          header: true,
+                          child: Text(
+                            title,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.headlineMedium,
+                          ),
+                        ),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            subtitle!,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 24),
+                        child,
+                      ],
                     ),
                   ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 8),
-                    Text(subtitle!, style: theme.textTheme.bodyLarge),
-                  ],
-                  const SizedBox(height: 32),
-                  child,
+                  if (footer != null) ...[const SizedBox(height: 16), footer!],
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.verified_user_outlined,
+                        size: 18,
+                        color: theme.colorScheme.secondary,
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          'Réseau professionnel sécurisé',
+                          style: theme.textTheme.labelMedium,
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -52,6 +109,22 @@ class AuthFormScaffold extends StatelessWidget {
       ),
     );
   }
+}
+
+class _LogoBadge extends StatelessWidget {
+  const _LogoBadge();
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: 72,
+    height: 72,
+    decoration: const BoxDecoration(
+      color: RisottoColors.cream,
+      shape: BoxShape.circle,
+    ),
+    alignment: Alignment.center,
+    child: const RisottoLogo(size: 44),
+  );
 }
 
 /// Error message shown above the submit button, announced by screen readers.
@@ -94,12 +167,16 @@ class SubmitButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     required this.loading,
+    this.icon = Icons.arrow_forward,
     super.key,
   });
 
   final String label;
   final VoidCallback onPressed;
   final bool loading;
+
+  /// Shown after the label.
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +191,16 @@ class SubmitButton extends StatelessWidget {
                 semanticsLabel: 'Chargement',
               ),
             )
-          : Text(label),
+          : Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(child: Text(label)),
+                if (icon != null) ...[
+                  const SizedBox(width: 8),
+                  Icon(icon, size: 20),
+                ],
+              ],
+            ),
     );
   }
 }

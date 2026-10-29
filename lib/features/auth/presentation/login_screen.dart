@@ -61,8 +61,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return AuthFormScaffold(
-      title: 'Connexion',
-      subtitle: 'Retrouvez votre réseau Risotto.',
+      appBarTitle: 'Connexion',
+      title: 'Ravi de vous revoir !',
+      subtitle: 'Connectez-vous pour retrouver vos contacts et votre réseau.',
+      footer: Wrap(
+        alignment: WrapAlignment.center,
+        crossAxisAlignment: WrapCrossAlignment.center,
+        children: [
+          const Text('Pas encore de compte ?'),
+          TextButton(
+            onPressed: () => context.go(AppRoutes.register),
+            child: const Text('Créer un compte'),
+          ),
+        ],
+      ),
       child: AutofillGroup(
         child: Form(
           key: _formKey,
@@ -76,7 +88,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 textInputAction: TextInputAction.next,
                 autocorrect: false,
                 validator: AuthValidators.email,
-                decoration: const InputDecoration(labelText: 'Email'),
+                decoration: const InputDecoration(
+                  labelText: 'Email',
+                  prefixIcon: Icon(Icons.alternate_email),
+                ),
               ),
               const SizedBox(height: 16),
               PasswordField(
@@ -101,11 +116,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 label: 'Se connecter',
                 loading: _loading,
                 onPressed: _submit,
-              ),
-              const SizedBox(height: 24),
-              OutlinedButton(
-                onPressed: () => context.go(AppRoutes.register),
-                child: const Text('Créer un compte'),
               ),
             ],
           ),

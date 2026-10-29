@@ -39,6 +39,7 @@ class _PasswordFieldState extends State<PasswordField> {
       validator: widget.validator,
       decoration: InputDecoration(
         labelText: widget.label,
+        prefixIcon: const Icon(Icons.lock_outline),
         suffixIcon: IconButton(
           tooltip: _obscured
               ? 'Afficher le mot de passe'

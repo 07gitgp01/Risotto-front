@@ -56,6 +56,7 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return AuthFormScaffold(
+      appBarTitle: 'Mot de passe',
       title: 'Mot de passe oublié',
       subtitle:
           'Saisissez votre email : si un compte existe, vous recevrez un code à 6 chiffres.',
@@ -72,7 +73,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
               autocorrect: false,
               validator: AuthValidators.email,
               onFieldSubmitted: (_) => _submit(),
-              decoration: const InputDecoration(labelText: 'Email'),
+              decoration: const InputDecoration(
+                labelText: 'Email',
+                prefixIcon: Icon(Icons.alternate_email),
+              ),
             ),
             const SizedBox(height: 24),
             if (_error != null) ...[
