@@ -1,21 +1,34 @@
 /// Signed-in user as returned by the API.
 class AuthUser {
-  const AuthUser({required this.id, required this.email});
+  const AuthUser({required this.id, required this.email, this.isAdmin = false});
 
-  factory AuthUser.fromJson(Map<String, dynamic> json) =>
-      AuthUser(id: json['id'] as String, email: json['email'] as String);
+  factory AuthUser.fromJson(Map<String, dynamic> json) => AuthUser(
+    id: json['id'] as String,
+    email: json['email'] as String,
+    isAdmin: json['role'] == 'admin',
+  );
 
   final String id;
   final String email;
 
-  Map<String, dynamic> toJson() => {'id': id, 'email': email};
+  /// Only shows the administration entry; the API checks the role on every call.
+  final bool isAdmin;
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'email': email,
+    'role': isAdmin ? 'admin' : 'member',
+  };
 
   @override
   bool operator ==(Object other) =>
-      other is AuthUser && other.id == id && other.email == email;
+      other is AuthUser &&
+      other.id == id &&
+      other.email == email &&
+      other.isAdmin == isAdmin;
 
   @override
-  int get hashCode => Object.hash(id, email);
+  int get hashCode => Object.hash(id, email, isAdmin);
 }
 
 class AuthTokens {

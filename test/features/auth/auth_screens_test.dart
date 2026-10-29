@@ -68,6 +68,24 @@ void main() {
       expect(find.text('Ravi de vous revoir !'), findsOneWidget);
     });
 
+    testWidgets('explains that a suspended account cannot sign in', (
+      tester,
+    ) async {
+      auth.failWith = const ApiException(
+        ApiErrorKind.unauthorized,
+        statusCode: 403,
+      );
+      await start(tester);
+      await enterField(tester, 'Email', 'alice@example.com');
+      await enterField(tester, 'Mot de passe', 'risotto-2026');
+      await tapText(tester, 'Se connecter');
+
+      expect(
+        find.text('Ce compte a été suspendu. Contactez l’équipe Risotto.'),
+        findsOneWidget,
+      );
+    });
+
     testWidgets('shows a network error message', (tester) async {
       auth.failWith = const ApiException(ApiErrorKind.network);
       await start(tester);

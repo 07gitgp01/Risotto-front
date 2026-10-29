@@ -46,7 +46,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     } on ApiException catch (error) {
       if (mounted) {
         setState(
-          () => _error = error.kind == ApiErrorKind.unauthorized
+          () => _error = error.statusCode == 403
+              // Only sent when the password is right.
+              ? 'Ce compte a été suspendu. Contactez l’équipe Risotto.'
+              : error.kind == ApiErrorKind.unauthorized
               ? 'Email ou mot de passe incorrect.'
               : error.message,
         );
