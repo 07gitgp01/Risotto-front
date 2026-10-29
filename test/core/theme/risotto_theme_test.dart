@@ -47,6 +47,18 @@ void main() {
       );
     });
 
+    test('uses the bundled Plus Jakarta Sans font', () {
+      expect(theme.textTheme.bodyMedium?.fontFamily, risottoFontFamily);
+      expect(theme.textTheme.headlineLarge?.fontWeight, FontWeight.w800);
+    });
+
+    test('buttons are pills', () {
+      expect(
+        theme.filledButtonTheme.style!.shape!.resolve({}),
+        isA<StadiumBorder>(),
+      );
+    });
+
     test('buttons keep a 48 dp minimum touch target', () {
       for (final style in [
         theme.filledButtonTheme.style!,
@@ -70,6 +82,22 @@ void main() {
         'onError/error': (scheme.onError, scheme.error),
         'error/surface': (scheme.error, scheme.surface),
         'onSurfaceVariant/surface': (scheme.onSurfaceVariant, scheme.surface),
+        // Design-system pairs used by cards, pills and badges.
+        'secondary text/white card': (
+          RisottoColors.charcoalSoft,
+          RisottoColors.white,
+        ),
+        'secondary text/neutral panel': (
+          RisottoColors.charcoalSoft,
+          RisottoColors.creamDark,
+        ),
+        'charcoal/saffron soft': (
+          RisottoColors.charcoal,
+          RisottoColors.saffronSoft,
+        ),
+        'basil/basil soft pill': (RisottoColors.basil, RisottoColors.basilSoft),
+        'basil/white card': (RisottoColors.basil, RisottoColors.white),
+        'white/badge': (RisottoColors.white, RisottoColors.tomatoDeep),
       };
       pairs.forEach((name, pair) {
         expect(

@@ -95,6 +95,9 @@ Future<void> pumpRisottoApp(
 
 /// Brings [finder] on screen: lazily built lists are scrolled until it exists.
 Future<void> revealFinder(WidgetTester tester, Finder finder) async {
+  // A focused text field would scroll itself back into view and hide the target.
+  FocusManager.instance.primaryFocus?.unfocus();
+  await tester.pump();
   if (finder.evaluate().isEmpty) {
     // The page's main list (the last one: pushed routes are built after earlier ones).
     final page = find.byType(ListView).last;
@@ -123,4 +126,41 @@ Future<void> tapText(WidgetTester tester, String text) async {
   await revealFinder(tester, finder);
   await tester.tap(finder);
   await tester.pumpAndSettle();
+}
+
+/// From the welcome screen (signed out) to the login form.
+Future<void> openLogin(WidgetTester tester) =>
+    tapText(tester, 'J’ai déjà un compte');
+
+/// Opens a main tab from the bottom navigation bar.
+Future<void> openTab(WidgetTester tester, String label) async {
+  await tester.tap(
+    find.descendant(of: find.byType(NavigationBar), matching: find.text(label)),
+  );
+  await tester.pumpAndSettle();
+}
+
+/// "Ma carte" (QR code), from the middle button of the bottom bar.
+Future<void> openMyCard(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Ma carte'));
+  await tester.pumpAndSettle();
+}
+
+/// Signs out from the Profil tab.
+Future<void> signOut(WidgetTester tester) async {
+  await openTab(tester, 'Profil');
+  await tapText(tester, 'Se déconnecter');
+}
+
+/// Member search, from the Réseau tab.
+Future<void> openSearch(WidgetTester tester) async {
+  await openTab(tester, 'Réseau');
+  await tester.tap(find.text('Rechercher par nom, métier ou entreprise'));
+  await tester.pumpAndSettle();
+}
+
+/// "Mes contacts", from the Profil tab.
+Future<void> openContacts(WidgetTester tester) async {
+  await openTab(tester, 'Profil');
+  await tapText(tester, 'Mes contacts');
 }

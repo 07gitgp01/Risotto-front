@@ -76,7 +76,10 @@ void main() {
     await tapText(tester, 'Bob Durand souhaite rejoindre votre réseau.');
 
     expect(notifications.calls, contains('markRead:n1'));
-    expect(find.text('Mon réseau'), findsOneWidget);
+    expect(
+      find.text('Rechercher par nom, métier ou entreprise'),
+      findsOneWidget,
+    );
   });
 
   testWidgets('marks everything as read', (tester) async {
@@ -131,8 +134,7 @@ void main() {
     final auth = FakeAuthRepository();
     await start(tester, auth: auth);
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('Se déconnecter'));
-    await tester.pumpAndSettle();
+    await signOut(tester);
 
     expect(notifications.calls, contains('removeDevice'));
     expect(notifications.devices, isEmpty);

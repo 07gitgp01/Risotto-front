@@ -48,8 +48,7 @@ void main() {
         storage: InMemorySessionStorage(testSession()),
         responseCache: cache,
       );
-      await tester.tap(find.byTooltip('Se déconnecter'));
-      await tester.pumpAndSettle();
+      await signOut(tester);
 
       expect(await cache.read('user-1', '/dashboard?'), isNull);
     });
@@ -65,7 +64,10 @@ void main() {
       largeText(tester);
       await pumpRisottoApp(tester);
       expect(tester.takeException(), isNull);
-      expect(find.text('Connexion'), findsOneWidget);
+      expect(find.text('Partagez vos contacts d’un scan'), findsOneWidget);
+      await openLogin(tester);
+      expect(tester.takeException(), isNull);
+      expect(find.text('Ravi de vous revoir !'), findsOneWidget);
     });
 
     testWidgets('the dashboard stays usable with a large text size', (
@@ -94,7 +96,7 @@ void main() {
           unread: 1,
         ),
       );
-      await tapText(tester, 'Messages');
+      await openTab(tester, 'Messages');
       await tapText(tester, 'Bob Durand');
 
       expect(

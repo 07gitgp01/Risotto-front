@@ -38,7 +38,7 @@ void main() {
 
   Future<void> openChat(WidgetTester tester) async {
     await start(tester);
-    await tapText(tester, 'Messages');
+    await openTab(tester, 'Messages');
     await tapText(tester, 'Bob Durand');
   }
 
@@ -57,12 +57,13 @@ void main() {
       ),
     );
     expect(badge.isLabelVisible, isTrue);
-    expect((badge.label! as Text).data, '2');
+    // Unread messages across conversations (the fake has 1).
+    expect((badge.label! as Text).data, '1');
   });
 
   testWidgets('lists conversations with the last message', (tester) async {
     await start(tester);
-    await tapText(tester, 'Messages');
+    await openTab(tester, 'Messages');
     expect(find.text('Bob Durand'), findsOneWidget);
     expect(find.text('Ça marche, à demain !'), findsOneWidget);
   });
@@ -211,7 +212,7 @@ void main() {
       profiles: profiles,
       connections: connections,
     );
-    await tapText(tester, 'Rechercher');
+    await openSearch(tester);
     await tester.enterText(find.byType(TextField), 'bob');
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();

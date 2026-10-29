@@ -39,7 +39,7 @@ void main() {
   );
 
   Future<void> searchFor(WidgetTester tester, String query) async {
-    await tapText(tester, 'Rechercher');
+    await openSearch(tester);
     await tester.enterText(find.byType(TextField), query);
     await tester.pump(const Duration(milliseconds: 400));
     await tester.pumpAndSettle();
@@ -77,8 +77,8 @@ void main() {
     testWidgets('accepts an incoming request', (tester) async {
       connections.addIncoming(bob, message: 'Rencontrés au salon');
       await start(tester);
-      await tapText(tester, 'Réseau');
-      await tapText(tester, 'Reçues (1)');
+      await openTab(tester, 'Réseau');
+      await tapText(tester, 'Demandes (1)');
 
       expect(find.text('« Rencontrés au salon »'), findsOneWidget);
       await tapText(tester, 'Accepter');
@@ -88,25 +88,28 @@ void main() {
         find.text('Vous êtes maintenant en relation avec Bob.'),
         findsOneWidget,
       );
-      await tapText(tester, 'Relations');
+      await tapText(tester, 'Relations (1)');
       expect(find.text('Bob Durand'), findsOneWidget);
     });
 
     testWidgets('declines an incoming request', (tester) async {
       connections.addIncoming(carol);
       await start(tester);
-      await tapText(tester, 'Réseau');
-      await tapText(tester, 'Reçues (1)');
+      await openTab(tester, 'Réseau');
+      await tapText(tester, 'Demandes (1)');
       await tapText(tester, 'Refuser');
 
       expect(connections.calls, contains('decline'));
-      expect(find.text('Aucune demande reçue.'), findsOneWidget);
+      expect(
+        find.textContaining('Vous n’avez pas de demande en attente'),
+        findsOneWidget,
+      );
     });
 
     testWidgets('removing a connection asks for confirmation', (tester) async {
       connections.addAccepted(bob);
       await start(tester);
-      await tapText(tester, 'Réseau');
+      await openTab(tester, 'Réseau');
       await tapText(tester, 'Bob Durand');
       await tapText(tester, 'En relation');
       await tapText(tester, 'Retirer');
@@ -149,7 +152,7 @@ void main() {
         const BlockedUser(userId: 'bob', firstName: 'Bob', lastName: 'Durand'),
       );
       await start(tester);
-      await tapText(tester, 'Réseau');
+      await openTab(tester, 'Réseau');
       await tester.tap(find.byTooltip('Plus d’options'));
       await tester.pumpAndSettle();
       await tapText(tester, 'Membres bloqués');
@@ -164,7 +167,8 @@ void main() {
     final contacts = FakeContactsRepository()
       ..scannable[validPayload] = bobCard;
     await start(tester, contacts: contacts, scannerPayloads: [validPayload]);
-    await tapText(tester, 'Scanner');
+    await openMyCard(tester);
+    await tapText(tester, 'Scanner un code');
     await tapText(tester, 'scan:$validPayload');
     await tapText(tester, 'Se connecter');
 

@@ -37,7 +37,7 @@ void main() {
   testWidgets('greets the user on a cream background', (tester) async {
     await start(tester);
     expect(find.text('Bonjour, Alice'), findsOneWidget);
-    expect(find.text('3 relations · 1 contact'), findsOneWidget);
+    expect(find.text('Ma carte Risotto'), findsOneWidget);
     final context = tester.element(find.byType(Scaffold).first);
     expect(Theme.of(context).scaffoldBackgroundColor, RisottoColors.cream);
   });
@@ -46,10 +46,14 @@ void main() {
     tester,
   ) async {
     await start(tester);
-    expect(find.text('Demandes en attente (1)'), findsOneWidget);
+    // Key figures.
+    expect(find.bySemanticsLabel('1 Demandes reçues'), findsOneWidget);
+    expect(find.bySemanticsLabel('2 Messages non lus'), findsOneWidget);
+    expect(find.bySemanticsLabel('3 Relations'), findsOneWidget);
+    await revealFinder(tester, find.text('Demandes en attente (1)'));
     expect(find.text('Rencontrés au salon'), findsOneWidget);
-    expect(find.text('Messages non lus (2)'), findsOneWidget);
-    expect(find.text('Tu es dispo ?'), findsOneWidget);
+    await revealFinder(tester, find.text('Messages non lus (2)'));
+    await revealFinder(tester, find.text('Tu es dispo ?'));
     await revealFinder(tester, find.text('Bob Durand vous a écrit.'));
     expect(find.text('Bob Durand vous a écrit.'), findsOneWidget);
     expect(
@@ -64,7 +68,7 @@ void main() {
     await tapText(tester, 'Accepter');
 
     expect(connections.calls, contains('accept'));
-    expect(find.text('Aucune demande en attente.'), findsOneWidget);
+    expect(find.text('Demandes en attente (1)'), findsNothing);
   });
 
   testWidgets('an unread conversation opens the chat', (tester) async {
@@ -89,14 +93,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(dashboard.loads, greaterThan(before));
+    await revealFinder(tester, find.text('Vous êtes à jour.'));
     expect(find.text('Vous êtes à jour.'), findsOneWidget);
   });
 
   testWidgets('empty states invite to act', (tester) async {
     dashboard.json = emptyDashboardJson();
     await start(tester);
-    expect(find.text('Aucune demande en attente.'), findsOneWidget);
-    expect(find.text('Vous êtes à jour.'), findsOneWidget);
+    expect(find.textContaining('Demandes en attente'), findsNothing);
+    await revealFinder(tester, find.text('Vous êtes à jour.'));
+    await revealFinder(tester, find.textContaining('Rien de neuf'));
     expect(find.textContaining('Rien de neuf'), findsOneWidget);
   });
 
@@ -110,15 +116,16 @@ void main() {
 
     dashboard.failWith = null;
     await tapText(tester, 'Réessayer');
-    expect(find.text('Demandes en attente (1)'), findsOneWidget);
+    expect(find.bySemanticsLabel('1 Demandes reçues'), findsOneWidget);
   });
 
-  testWidgets('quick actions show counts and meet accessibility guidelines', (
+  testWidgets('bottom bar shows counts and meets accessibility guidelines', (
     tester,
   ) async {
     final handle = tester.ensureSemantics();
     await start(tester);
-    expect(find.text('Messages'), findsOneWidget);
+    expect(find.byTooltip('Réseau, 1 demandes en attente'), findsOneWidget);
+    expect(find.byTooltip('Ma carte'), findsOneWidget);
     await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
     await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
     await expectLater(tester, meetsGuideline(textContrastGuideline));

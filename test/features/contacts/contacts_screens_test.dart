@@ -30,7 +30,7 @@ void main() {
   group('my card', () {
     testWidgets('shows my QR code and my card', (tester) async {
       await start(tester);
-      await tapText(tester, 'Ma carte');
+      await openMyCard(tester);
 
       final qr = tester.widget<QrImageView>(find.byType(QrImageView));
       expect(qr.size, 240);
@@ -40,14 +40,14 @@ void main() {
 
     testWidgets('shares my card as a vCard', (tester) async {
       await start(tester);
-      await tapText(tester, 'Ma carte');
+      await openMyCard(tester);
       await tapText(tester, 'Partager ma carte (vCard)');
       expect(sharer.shared.single.userId, 'user-1');
     });
 
     testWidgets('rotating the QR code asks for confirmation', (tester) async {
       await start(tester);
-      await tapText(tester, 'Ma carte');
+      await openMyCard(tester);
       await tester.tap(find.byTooltip('Générer un nouveau QR code'));
       await tester.pumpAndSettle();
       await tapText(tester, 'Annuler');
@@ -65,7 +65,8 @@ void main() {
     testWidgets('a scanned card can be saved', (tester) async {
       contacts.scannable[validPayload] = bobCard;
       await start(tester, scannerPayloads: [validPayload]);
-      await tapText(tester, 'Scanner');
+      await openMyCard(tester);
+      await tapText(tester, 'Scanner un code');
       await tapText(tester, 'scan:$validPayload');
 
       expect(find.text('Bob Durand'), findsOneWidget);
@@ -81,7 +82,8 @@ void main() {
       tester,
     ) async {
       await start(tester, scannerPayloads: ['https://example.com']);
-      await tapText(tester, 'Scanner');
+      await openMyCard(tester);
+      await tapText(tester, 'Scanner un code');
       await tapText(tester, 'scan:https://example.com');
 
       expect(
@@ -95,7 +97,8 @@ void main() {
       tester,
     ) async {
       await start(tester, scannerPayloads: [validPayload]);
-      await tapText(tester, 'Scanner');
+      await openMyCard(tester);
+      await tapText(tester, 'Scanner un code');
       await tapText(tester, 'scan:$validPayload');
       expect(find.text('QR code inconnu ou expiré.'), findsOneWidget);
     });
@@ -103,7 +106,8 @@ void main() {
     testWidgets('scanning my own code says so', (tester) async {
       contacts.scannable[validPayload] = myCardFixture;
       await start(tester, scannerPayloads: [validPayload]);
-      await tapText(tester, 'Scanner');
+      await openMyCard(tester);
+      await tapText(tester, 'Scanner un code');
       await tapText(tester, 'scan:$validPayload');
       expect(find.text('C’est votre propre QR code.'), findsOneWidget);
       expect(find.text('Enregistrer le contact'), findsNothing);
@@ -115,14 +119,14 @@ void main() {
 
     testWidgets('empty state invites to scan', (tester) async {
       await start(tester);
-      await tapText(tester, 'Contacts');
+      await openContacts(tester);
       expect(find.textContaining('Aucun contact'), findsOneWidget);
     });
 
     testWidgets('lists saved contacts and opens a detail', (tester) async {
       contacts.saved.add(savedBob);
       await start(tester);
-      await tapText(tester, 'Contacts');
+      await openContacts(tester);
       expect(find.text('Bob Durand'), findsOneWidget);
 
       await tapText(tester, 'Bob Durand');
@@ -132,7 +136,7 @@ void main() {
     testWidgets('saves a private note', (tester) async {
       contacts.saved.add(savedBob);
       await start(tester);
-      await tapText(tester, 'Contacts');
+      await openContacts(tester);
       await tapText(tester, 'Bob Durand');
 
       await tester.enterText(
@@ -148,7 +152,7 @@ void main() {
     testWidgets('exports a contact as a vCard', (tester) async {
       contacts.saved.add(savedBob);
       await start(tester);
-      await tapText(tester, 'Contacts');
+      await openContacts(tester);
       await tapText(tester, 'Bob Durand');
       await tapText(tester, 'Exporter (vCard)');
       expect(sharer.shared.single.userId, 'bob');
@@ -157,7 +161,7 @@ void main() {
     testWidgets('deletes a contact after confirmation', (tester) async {
       contacts.saved.add(savedBob);
       await start(tester);
-      await tapText(tester, 'Contacts');
+      await openContacts(tester);
       await tapText(tester, 'Bob Durand');
       await tester.tap(find.byTooltip('Supprimer le contact'));
       await tester.pumpAndSettle();
@@ -174,7 +178,7 @@ void main() {
       final handle = tester.ensureSemantics();
       contacts.saved.add(savedBob);
       await start(tester);
-      await tapText(tester, 'Contacts');
+      await openContacts(tester);
       await expectLater(tester, meetsGuideline(androidTapTargetGuideline));
       await expectLater(tester, meetsGuideline(labeledTapTargetGuideline));
       await expectLater(tester, meetsGuideline(textContrastGuideline));

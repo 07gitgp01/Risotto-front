@@ -20,19 +20,22 @@ void main() {
     expect(appRedirect(const AuthUnknown(), unknown, AppRoutes.splash), isNull);
   });
 
-  test('sends signed-out users to login, except on public routes', () {
-    expect(
-      appRedirect(const Unauthenticated(), unknown, AppRoutes.home),
-      AppRoutes.login,
-    );
-    expect(
-      appRedirect(const Unauthenticated(), unknown, AppRoutes.myProfile),
-      AppRoutes.login,
-    );
-    for (final route in AppRoutes.publicRoutes) {
-      expect(appRedirect(const Unauthenticated(), unknown, route), isNull);
-    }
-  });
+  test(
+    'sends signed-out users to the welcome screen, except on public routes',
+    () {
+      expect(
+        appRedirect(const Unauthenticated(), unknown, AppRoutes.home),
+        AppRoutes.welcome,
+      );
+      expect(
+        appRedirect(const Unauthenticated(), unknown, AppRoutes.myProfile),
+        AppRoutes.welcome,
+      );
+      for (final route in AppRoutes.publicRoutes) {
+        expect(appRedirect(const Unauthenticated(), unknown, route), isNull);
+      }
+    },
+  );
 
   test('sends signed-in users away from auth screens', () {
     expect(appRedirect(signedIn, present, AppRoutes.login), AppRoutes.home);

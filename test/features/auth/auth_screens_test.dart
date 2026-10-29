@@ -15,13 +15,26 @@ void main() {
     storage = InMemorySessionStorage();
   });
 
-  Future<void> start(WidgetTester tester) =>
-      pumpRisottoApp(tester, auth: auth, storage: storage);
+  /// Signed out, the app opens on the welcome screen: go on to the login form.
+  Future<void> start(WidgetTester tester) async {
+    await pumpRisottoApp(tester, auth: auth, storage: storage);
+    if (storage.session == null) {
+      await openLogin(tester);
+    }
+  }
 
   group('login', () {
-    testWidgets('signed-out users land on the login screen', (tester) async {
+    testWidgets('signed-out users land on the welcome screen', (tester) async {
+      await pumpRisottoApp(tester, auth: auth, storage: storage);
+      expect(find.text('Partagez vos contacts d’un scan'), findsOneWidget);
+
+      await tapText(tester, 'Commencer');
+      expect(find.text('Créer un compte'), findsOneWidget);
+    });
+
+    testWidgets('the welcome screen leads to the login form', (tester) async {
       await start(tester);
-      expect(find.text('Connexion'), findsOneWidget);
+      expect(find.text('Ravi de vous revoir !'), findsOneWidget);
     });
 
     testWidgets('validates the form before calling the API', (tester) async {
@@ -52,7 +65,7 @@ void main() {
       await tapText(tester, 'Se connecter');
 
       expect(find.text('Email ou mot de passe incorrect.'), findsOneWidget);
-      expect(find.text('Connexion'), findsOneWidget);
+      expect(find.text('Ravi de vous revoir !'), findsOneWidget);
     });
 
     testWidgets('shows a network error message', (tester) async {
@@ -152,7 +165,7 @@ void main() {
         'code': '042517',
         'newPassword': 'nouveau-2027',
       });
-      expect(find.text('Connexion'), findsOneWidget);
+      expect(find.text('Ravi de vous revoir !'), findsOneWidget);
       expect(find.textContaining('Mot de passe modifié'), findsOneWidget);
     });
 
@@ -190,13 +203,12 @@ void main() {
       expect(find.textContaining('Bonjour'), findsOneWidget);
     });
 
-    testWidgets('logout returns to the login screen', (tester) async {
+    testWidgets('logout returns to the welcome screen', (tester) async {
       storage.session = testSession();
       await start(tester);
-      await tester.tap(find.byTooltip('Se déconnecter'));
-      await tester.pumpAndSettle();
+      await signOut(tester);
 
-      expect(find.text('Connexion'), findsOneWidget);
+      expect(find.text('Partagez vos contacts d’un scan'), findsOneWidget);
       expect(storage.session, isNull);
       expect(auth.calls, contains('logout'));
     });

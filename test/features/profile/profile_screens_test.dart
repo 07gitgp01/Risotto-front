@@ -30,8 +30,7 @@ void main() {
 
   Future<void> openMyProfile(WidgetTester tester) async {
     await startSignedIn(tester);
-    await tester.tap(find.byTooltip('Mon profil'));
-    await tester.pumpAndSettle();
+    await openTab(tester, 'Profil');
   }
 
   group('setup', () {
@@ -74,8 +73,7 @@ void main() {
 
     testWidgets('edits fields, visibility and sharing', (tester) async {
       await openMyProfile(tester);
-      await tester.tap(find.byTooltip('Modifier le profil'));
-      await tester.pumpAndSettle();
+      await tapText(tester, 'Modifier mon profil');
 
       await enterField(tester, 'Titre', 'CTO');
       await enterField(tester, 'Site web', 'https://alice.example.com');
@@ -92,10 +90,22 @@ void main() {
       expect(find.text('Visibilité : Public'), findsOneWidget);
     });
 
+    testWidgets('changes the visibility directly from the profile', (
+      tester,
+    ) async {
+      await openMyProfile(tester);
+      await tapText(tester, 'Privé');
+
+      expect(profiles.lastInput!.visibility, ProfileVisibility.private);
+      // The other fields are sent unchanged.
+      expect(profiles.lastInput!.firstName, 'Alice');
+      expect(profiles.lastInput!.company, 'Risotto SAS');
+      expect(find.text('Visibilité : Privé'), findsOneWidget);
+    });
+
     testWidgets('validates website and phone before saving', (tester) async {
       await openMyProfile(tester);
-      await tester.tap(find.byTooltip('Modifier le profil'));
-      await tester.pumpAndSettle();
+      await tapText(tester, 'Modifier mon profil');
 
       // Fields in screen order: the helper only scrolls downwards.
       await enterField(tester, 'Téléphone', 'appelle-moi');
@@ -103,6 +113,17 @@ void main() {
       await tapText(tester, 'Enregistrer');
 
       expect(find.textContaining('Adresse web invalide'), findsOneWidget);
+      // The phone field is above, out of the lazily built list: scroll back up.
+      await tester.scrollUntilVisible(
+        find.text('Numéro de téléphone invalide.'),
+        -200,
+        scrollable: find
+            .descendant(
+              of: find.byType(ListView).last,
+              matching: find.byType(Scrollable),
+            )
+            .first,
+      );
       expect(find.text('Numéro de téléphone invalide.'), findsOneWidget);
       expect(profiles.calls, isNot(contains('update')));
     });
