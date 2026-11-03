@@ -11,89 +11,13 @@ import '../../contacts/application/contacts_providers.dart';
 import '../../dashboard/application/dashboard_provider.dart';
 import '../../shell/main_app_bar.dart';
 import '../application/my_profile_controller.dart';
-import '../application/photo_picker.dart';
 import '../data/profile_models.dart';
+import 'widgets/change_profile_photo.dart';
 import 'widgets/profile_avatar.dart';
-
-enum _PhotoAction { camera, gallery, remove }
 
 /// Profil tab (design: mon_profil): identity, my card, visibility, figures, links.
 class MyProfileScreen extends ConsumerWidget {
   const MyProfileScreen({super.key});
-
-  Future<void> _changePhoto(
-    BuildContext context,
-    WidgetRef ref,
-    Profile profile,
-  ) async {
-    final action = await showModalBottomSheet<_PhotoAction>(
-      context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.photo_camera_outlined),
-              title: const Text('Prendre une photo'),
-              onTap: () => Navigator.pop(context, _PhotoAction.camera),
-            ),
-            ListTile(
-              leading: const Icon(Icons.photo_library_outlined),
-              title: const Text('Choisir dans la galerie'),
-              onTap: () => Navigator.pop(context, _PhotoAction.gallery),
-            ),
-            if (profile.photoUrl != null)
-              ListTile(
-                leading: const Icon(Icons.delete_outline),
-                title: const Text('Supprimer la photo'),
-                onTap: () => Navigator.pop(context, _PhotoAction.remove),
-              ),
-          ],
-        ),
-      ),
-    );
-    if (action == null || !context.mounted) {
-      return;
-    }
-
-    final messenger = ScaffoldMessenger.of(context);
-    final controller = ref.read(myProfileProvider.notifier);
-    try {
-      if (action == _PhotoAction.remove) {
-        await controller.removePhoto();
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Photo supprimée.')),
-        );
-        return;
-      }
-      final picked = await ref
-          .read(photoPickerProvider)
-          .pick(
-            action == _PhotoAction.camera
-                ? PhotoSource.camera
-                : PhotoSource.gallery,
-          );
-      if (picked == null) {
-        return;
-      }
-      await controller.setPhoto(picked.bytes, picked.filename);
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Photo mise à jour.')),
-      );
-    } on ApiException catch (error) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            error.kind == ApiErrorKind.invalidInput
-                ? 'Format non pris en charge : choisissez une image JPEG, PNG ou WebP.'
-                : error.statusCode == 413
-                ? 'Image trop lourde (5 Mo maximum).'
-                : error.message,
-          ),
-        ),
-      );
-    }
-  }
 
   Future<void> _changeVisibility(
     BuildContext context,
@@ -151,7 +75,8 @@ class MyProfileScreen extends ConsumerWidget {
                 children: [
                   _Header(
                     profile: profile,
-                    onChangePhoto: () => _changePhoto(context, ref, profile),
+                    onChangePhoto: () =>
+                        changeProfilePhoto(context, ref, profile),
                   ),
                   const SizedBox(height: 12),
                   SurfaceCard(
