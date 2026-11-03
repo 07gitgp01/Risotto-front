@@ -428,11 +428,7 @@ class _ActivityCard extends StatelessWidget {
 }
 
 class _PersonRow extends StatelessWidget {
-  const _PersonRow({
-    required this.profile,
-    this.subtitle,
-    this.trailing,
-  });
+  const _PersonRow({required this.profile, this.subtitle, this.trailing});
 
   final Profile profile;
   final String? subtitle;

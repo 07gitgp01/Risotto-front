@@ -71,24 +71,30 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                     data: (profiles) => profiles.isEmpty
                         ? const _Hint('Aucun membre trouvé.')
                         : ListView.separated(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 32),
                             itemCount: profiles.length,
                             separatorBuilder: (_, _) =>
-                                const Divider(height: 1),
+                                const SizedBox(height: 12),
                             itemBuilder: (context, index) {
                               final profile = profiles[index];
-                              return MemberTile(
-                                profile: profile,
-                                below: profile.connection == null
-                                    ? null
-                                    : Align(
-                                        alignment: Alignment.centerLeft,
-                                        child: ConnectionButton(
-                                          userId: profile.userId,
-                                          name: profile.firstName,
-                                          state: profile.connection!,
-                                          compact: true,
+                              return SurfaceCard(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 4,
+                                ),
+                                child: MemberTile(
+                                  profile: profile,
+                                  below: profile.connection == null
+                                      ? null
+                                      : Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: ConnectionButton(
+                                            userId: profile.userId,
+                                            name: profile.firstName,
+                                            state: profile.connection!,
+                                            compact: true,
+                                          ),
                                         ),
-                                      ),
+                                ),
                               );
                             },
                           ),

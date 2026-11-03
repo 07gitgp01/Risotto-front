@@ -98,28 +98,25 @@ class UserProfileScreen extends ConsumerWidget {
           ),
         ),
         data: (profile) => ListView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
           children: [
             ProfileDetails(profile: profile),
             if (profile.connection != null) ...[
               const SizedBox(height: 24),
-              Center(
-                child: ConnectionButton(
-                  userId: profile.userId,
-                  name: profile.firstName,
-                  state: profile.connection!,
-                ),
-              ),
+              // Messaging is reserved to connections.
               if (profile.connection!.status == ConnectionStatus.connected) ...[
-                const SizedBox(height: 12),
-                Center(
-                  child: FilledButton.icon(
-                    icon: const Icon(Icons.chat_bubble_outline),
-                    label: const Text('Envoyer un message'),
-                    onPressed: () => openChatWith(context, ref, userId),
-                  ),
+                FilledButton.icon(
+                  icon: const Icon(Icons.chat_bubble_outline),
+                  label: const Text('Envoyer un message'),
+                  onPressed: () => openChatWith(context, ref, userId),
                 ),
+                const SizedBox(height: 12),
               ],
+              ConnectionButton(
+                userId: profile.userId,
+                name: profile.firstName,
+                state: profile.connection!,
+              ),
             ],
           ],
         ),

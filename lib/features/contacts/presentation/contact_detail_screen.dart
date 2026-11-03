@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/theme/risotto_colors.dart';
+import '../../../core/widgets/risotto_ui.dart';
 import '../application/contacts_providers.dart';
 import '../data/contacts_models.dart';
 import 'widgets/contact_card_view.dart';
@@ -35,14 +37,18 @@ class ContactDetailScreen extends ConsumerWidget {
       body: contact == null
           ? const Center(child: Text('Ce contact n’existe plus.'))
           : ListView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
               children: [
                 ContactCardView(card: contact.card),
                 const SizedBox(height: 16),
-                _NoteEditor(contact: contact),
+                SurfaceCard(child: _NoteEditor(contact: contact)),
                 const SizedBox(height: 16),
                 Builder(
-                  builder: (buttonContext) => OutlinedButton.icon(
+                  builder: (buttonContext) => FilledButton.tonalIcon(
+                    style: FilledButton.styleFrom(
+                      backgroundColor: RisottoColors.basilSoft,
+                      foregroundColor: RisottoColors.basil,
+                    ),
                     icon: const Icon(Icons.ios_share),
                     label: const Text('Exporter (vCard)'),
                     onPressed: () {
@@ -149,9 +155,28 @@ class _NoteEditorState extends ConsumerState<_NoteEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Row(
+          children: [
+            const Icon(Icons.edit_note, color: RisottoColors.basil),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Contexte de rencontre',
+                style: theme.textTheme.titleSmall,
+              ),
+            ),
+            const StatusPill(
+              'Privé',
+              tone: PillTone.neutral,
+              icon: Icons.lock_outline,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
         TextField(
           controller: _note,
           maxLines: 3,

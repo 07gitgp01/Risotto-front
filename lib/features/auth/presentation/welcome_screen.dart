@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -77,79 +79,89 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
-                    children: [
-                      const RisottoLogo(size: 40),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Risotto',
-                          style: theme.textTheme.headlineSmall,
-                        ),
-                      ),
-                      const StatusPill(
-                        'Réseautage pro',
-                        icon: Icons.circle,
-                        uppercase: true,
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: PageView(
-                      controller: _pages,
-                      onPageChanged: (page) => setState(() => _page = page),
+            child: LayoutBuilder(
+              builder: (context, box) => SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
                       children: [
-                        for (final slide in _slides) _SlideView(slide: slide),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Semantics(
-                    label: 'Page ${_page + 1} sur ${_slides.length}',
-                    excludeSemantics: true,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        for (var i = 0; i < _slides.length; i++)
-                          AnimatedContainer(
-                            duration: const Duration(milliseconds: 200),
-                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                            width: i == _page ? 28 : 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: i == _page
-                                  ? RisottoColors.saffron
-                                  : RisottoColors.outline,
-                              borderRadius: BorderRadius.circular(999),
-                            ),
+                        const RisottoLogo(size: 40),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'Risotto',
+                            style: theme.textTheme.headlineSmall,
                           ),
+                        ),
+                        const StatusPill(
+                          'Réseautage pro',
+                          icon: Icons.circle,
+                          uppercase: true,
+                        ),
                       ],
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    onPressed: () => context.go(AppRoutes.register),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text('Commencer'),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_forward, size: 20),
-                      ],
+                    const SizedBox(height: 16),
+                    // The slides take the room left by the header and the
+                    // actions; with large text the whole page scrolls instead.
+                    SizedBox(
+                      height: math.max(
+                        360,
+                        box.maxHeight -
+                            32 -
+                            250 * MediaQuery.textScalerOf(context).scale(1),
+                      ),
+                      child: PageView(
+                        controller: _pages,
+                        onPageChanged: (page) => setState(() => _page = page),
+                        children: [
+                          for (final slide in _slides) _SlideView(slide: slide),
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextButton(
-                    onPressed: () => context.go(AppRoutes.login),
-                    child: const Text('J’ai déjà un compte'),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    Semantics(
+                      label: 'Page ${_page + 1} sur ${_slides.length}',
+                      excludeSemantics: true,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (var i = 0; i < _slides.length; i++)
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: i == _page ? 28 : 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: i == _page
+                                    ? RisottoColors.saffron
+                                    : RisottoColors.outline,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                            ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton(
+                      onPressed: () => context.go(AppRoutes.register),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Commencer'),
+                          SizedBox(width: 8),
+                          Icon(Icons.arrow_forward, size: 20),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    TextButton(
+                      onPressed: () => context.go(AppRoutes.login),
+                      child: const Text('J’ai déjà un compte'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

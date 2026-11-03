@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/theme/risotto_colors.dart';
+import '../../../../core/widgets/risotto_ui.dart';
 import '../../../profile/presentation/widgets/profile_avatar.dart';
 import '../../data/contacts_models.dart';
 
-/// Visual business card: avatar, name, position and the shared contact details.
+/// Visual business card: avatar, name, position and the shared contact details
+/// (same look as the scan result card).
 class ContactCardView extends StatelessWidget {
   const ContactCardView({required this.card, super.key});
 
@@ -20,49 +23,56 @@ class ContactCardView extends StatelessWidget {
       (Icons.link, 'Site web', card.website),
     ].where((row) => row.$3 != null).toList();
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Row(
+    return SurfaceCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            height: 8,
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+              gradient: LinearGradient(
+                colors: [RisottoColors.saffron, RisottoColors.basil],
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
+            child: Column(
               children: [
                 ProfileAvatar(
                   initials: card.initials,
                   photoUrl: card.photoUrl,
                   name: card.fullName,
-                  radius: 28,
+                  radius: 40,
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        card.fullName,
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      if (card.headline != null)
-                        Text(card.headline!, style: theme.textTheme.bodyMedium),
-                    ],
+                const SizedBox(height: 12),
+                Text(
+                  card.fullName,
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.headlineSmall,
+                ),
+                if (card.headline != null)
+                  Text(
+                    card.headline!,
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: RisottoColors.basil,
+                    ),
                   ),
-                ),
               ],
             ),
-            if (details.isNotEmpty) const SizedBox(height: 8),
-            for (final (icon, label, value) in details)
-              ListTile(
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-                leading: Icon(icon, color: theme.colorScheme.secondary),
-                title: Text(value!),
-                subtitle: Text(label),
-              ),
-          ],
-        ),
+          ),
+          for (final (icon, label, value) in details)
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+              leading: IconTile(icon, tone: PillTone.basil, size: 40),
+              title: Text(value!),
+              subtitle: Text(label),
+            ),
+          const SizedBox(height: 8),
+        ],
       ),
     );
   }
