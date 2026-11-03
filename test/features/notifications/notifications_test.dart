@@ -4,6 +4,7 @@ import 'package:risotto/features/notifications/data/notifications_models.dart';
 import 'package:risotto/features/notifications/presentation/notification_routes.dart';
 
 import '../../helpers/fake_auth_repository.dart';
+import '../../helpers/fake_connections_repository.dart';
 import '../../helpers/fake_messaging.dart';
 import '../../helpers/fake_notifications.dart';
 import '../../helpers/in_memory_session_storage.dart';
@@ -37,17 +38,22 @@ void main() {
     WidgetTester tester, {
     FakeAuthRepository? auth,
     InMemorySessionStorage? storage,
+    FakeConnectionsRepository? connections,
   }) => pumpRisottoApp(
     tester,
     auth: auth,
+    connections: connections,
     storage: storage ?? InMemorySessionStorage(testSession()),
     notifications: notifications,
     realtime: realtime,
     push: push,
   );
 
-  Future<void> openNotifications(WidgetTester tester) async {
-    await start(tester);
+  Future<void> openNotifications(
+    WidgetTester tester, {
+    FakeConnectionsRepository? connections,
+  }) async {
+    await start(tester, connections: connections);
     await tester.tap(find.byIcon(Icons.notifications_outlined));
     await tester.pumpAndSettle();
   }
@@ -84,9 +90,67 @@ void main() {
 
   testWidgets('marks everything as read', (tester) async {
     await openNotifications(tester);
-    await tapText(tester, 'Tout lire');
+    await tapText(tester, 'Tout marquer comme lu');
     expect(notifications.calls, contains('markAllRead'));
-    expect(find.text('Tout lire'), findsNothing);
+    expect(find.text('Tout marquer comme lu'), findsNothing);
+  });
+
+  testWidgets('filters by category', (tester) async {
+    notifications.notifications.add(
+      AppNotification.fromJson(
+        notificationJson('n3', type: 'message', firstName: 'Dana'),
+      ),
+    );
+    await openNotifications(tester);
+    expect(find.text('Toutes (3)'), findsOneWidget);
+
+    await tapText(tester, 'Messages (1)');
+    expect(find.text('Nouveau message de Dana Durand.'), findsOneWidget);
+    expect(
+      find.text('Bob Durand souhaite rejoindre votre réseau.'),
+      findsNothing,
+    );
+
+    await tapText(tester, 'Réseau (2)');
+    expect(find.text('Nouveau message de Dana Durand.'), findsNothing);
+    expect(
+      find.text('Bob Durand souhaite rejoindre votre réseau.'),
+      findsOneWidget,
+    );
+  });
+
+  testWidgets('swiping left marks a notification as read', (tester) async {
+    await openNotifications(tester);
+    await tester.drag(
+      find.text('Bob Durand souhaite rejoindre votre réseau.'),
+      const Offset(-500, 0),
+    );
+    await tester.pumpAndSettle();
+
+    expect(notifications.calls, contains('markRead:n1'));
+    // Still listed, now read.
+    expect(
+      find.text('Bob Durand souhaite rejoindre votre réseau.'),
+      findsOneWidget,
+    );
+    expect(find.text('Tout marquer comme lu'), findsNothing);
+  });
+
+  testWidgets('a pending request can be accepted from its notification', (
+    tester,
+  ) async {
+    final connections = FakeConnectionsRepository()
+      ..addIncoming(member('bob', 'Bob', 'Durand'));
+    // The fake numbers requests c0, c1...: point the notification at c0.
+    notifications.notifications[0] = AppNotification.fromJson({
+      ...notificationJson('n1'),
+      'data': {'actorId': 'bob', 'connectionId': 'c0'},
+    });
+    await openNotifications(tester, connections: connections);
+
+    await tapText(tester, 'Accepter');
+    expect(connections.calls, contains('accept'));
+    expect(find.text('Accepter'), findsNothing);
   });
 
   testWidgets('a real-time notification shows a banner and updates the list', (
