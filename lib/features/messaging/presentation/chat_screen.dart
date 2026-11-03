@@ -4,8 +4,11 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../core/theme/risotto_colors.dart';
+import '../../../core/theme/risotto_theme.dart';
 import '../../../core/widgets/risotto_ui.dart';
 import '../../auth/application/auth_controller.dart';
+import '../../profile/data/profile_models.dart';
 import '../../profile/presentation/widgets/profile_avatar.dart';
 import '../application/messaging_providers.dart';
 import '../data/messaging_models.dart';
@@ -83,10 +86,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final myId = auth is Authenticated ? auth.user.id : '';
 
     return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text(chat.value?.conversation.user.fullName ?? 'Conversation'),
-      ),
+      appBar: AppBar(centerTitle: true, title: const Text('Conversation')),
       body: chat.when(
         loading: () => const PageLoading(),
         error: (error, _) => Center(
@@ -132,17 +132,26 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                       name: user.fullName,
                       radius: 24,
                     ),
-                    title: Text(user.fullName),
-                    subtitle: user.position == null && user.headline == null
+                    title: Text(
+                      user.fullName,
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    subtitle: _subtitle(user) == null
                         ? null
                         : Text(
-                            user.position ?? user.headline!,
+                            _subtitle(user)!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
                     trailing: const Icon(Icons.chevron_right),
                   ),
                 ),
+              ),
+              // Honest wording: encrypted at rest, not end to end.
+              const StatusPill(
+                'Messages chiffrés sur nos serveurs',
+                tone: PillTone.neutral,
+                icon: Icons.lock_outline,
               ),
               Expanded(
                 child: state.messages.isEmpty
@@ -171,13 +180,42 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                               child: PageLoading(),
                             );
                           }
-                          final message = state.messages[index];
-                          return _Bubble(
+                          // Reversed list: index - 1 is newer, index + 1 older.
+                          final messages = state.messages;
+                          final message = messages[index];
+                          final newer = index > 0 ? messages[index - 1] : null;
+                          final older = index + 1 < messages.length
+                              ? messages[index + 1]
+                              : null;
+                          final mine = message.senderId == myId;
+                          final bubble = _Bubble(
                             message: message,
-                            mine: message.senderId == myId,
+                            mine: mine,
+                            // Avatar on the last message of a run only.
+                            avatar:
+                                mine ||
+                                    (newer != null &&
+                                        newer.senderId == message.senderId)
+                                ? null
+                                : ProfileAvatar(
+                                    initials: user.initials,
+                                    photoUrl: user.photoUrl,
+                                    name: user.fullName,
+                                    radius: 16,
+                                  ),
                             receipt: message == lastMine
                                 ? (readByOther ? 'Lu' : 'Envoyé')
                                 : null,
+                          );
+                          if (older != null &&
+                              _sameDay(older.createdAt, message.createdAt)) {
+                            return bubble;
+                          }
+                          return Column(
+                            children: [
+                              _DaySeparator(message.createdAt),
+                              bubble,
+                            ],
                           );
                         },
                       ),
@@ -205,29 +243,62 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
   }
 }
 
+String? _subtitle(Profile user) {
+  final parts = [user.position ?? user.headline, user.location].nonNulls;
+  return parts.isEmpty ? null : parts.join(' • ');
+}
+
+bool _sameDay(DateTime a, DateTime b) {
+  final x = a.toLocal();
+  final y = b.toLocal();
+  return x.year == y.year && x.month == y.month && x.day == y.day;
+}
+
+/// Day pill between messages of different days.
+class _DaySeparator extends StatelessWidget {
+  const _DaySeparator(this.day);
+
+  final DateTime day;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 12),
+    child: Center(
+      child: StatusPill(dayLabel(day), tone: PillTone.neutral, uppercase: true),
+    ),
+  );
+}
+
 class _Bubble extends StatelessWidget {
-  const _Bubble({required this.message, required this.mine, this.receipt});
+  const _Bubble({
+    required this.message,
+    required this.mine,
+    this.avatar,
+    this.receipt,
+  });
 
   final ChatMessage message;
   final bool mine;
+
+  /// The sender's avatar, beside the last message of a run.
+  final Widget? avatar;
   final String? receipt;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    // Mine: basil with white text; theirs: light card with charcoal text.
     // Design: mine in saffron with charcoal text, theirs on white cards.
-    final background = mine ? colors.primary : colors.surfaceContainerLowest;
-    final foreground = mine ? colors.onPrimary : colors.onSurface;
+    final background = mine ? RisottoColors.saffron : RisottoColors.white;
+    const foreground = RisottoColors.charcoal;
     // One coherent sentence for screen readers instead of separate fragments.
     final spoken = [
       mine ? 'Vous' : 'Message reçu',
       message.body,
-      shortTime(message.createdAt),
+      clockTime(message.createdAt),
       ?receipt,
     ].join(', ');
     return Semantics(
+      container: true,
       label: spoken,
       excludeSemantics: true,
       child: _bubbleLayout(context, background, foreground, textTheme),
@@ -240,51 +311,67 @@ class _Bubble extends StatelessWidget {
     Color foreground,
     TextTheme textTheme,
   ) {
-    return Align(
-      alignment: mine ? Alignment.centerRight : Alignment.centerLeft,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.sizeOf(context).width * 0.78,
+    final time = Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          clockTime(message.createdAt),
+          style: textTheme.labelSmall?.copyWith(fontWeight: FontWeight.w600),
         ),
-        child: Column(
-          crossAxisAlignment: mine
-              ? CrossAxisAlignment.end
-              : CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 3),
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              decoration: BoxDecoration(
-                color: background,
-                borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(18),
-                  topRight: const Radius.circular(18),
-                  bottomLeft: Radius.circular(mine ? 18 : 4),
-                  bottomRight: Radius.circular(mine ? 4 : 18),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  SelectableText(
-                    message.body,
-                    style: textTheme.bodyLarge?.copyWith(color: foreground),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    shortTime(message.createdAt),
-                    style: textTheme.labelSmall?.copyWith(color: foreground),
-                  ),
-                ],
-              ),
+        if (receipt != null) ...[
+          const SizedBox(width: 4),
+          Icon(
+            receipt == 'Lu' ? Icons.done_all : Icons.done,
+            size: 14,
+            color: RisottoColors.basil,
+          ),
+          const SizedBox(width: 2),
+          Text(receipt!, style: textTheme.labelSmall),
+        ],
+      ],
+    );
+    final column = ConstrainedBox(
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.sizeOf(context).width * 0.74,
+      ),
+      child: Column(
+        crossAxisAlignment: mine
+            ? CrossAxisAlignment.end
+            : CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: background,
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: mine ? null : risottoCardShadow,
             ),
-            if (receipt != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(receipt!, style: textTheme.labelSmall),
-              ),
+            child: SelectableText(
+              message.body,
+              style: textTheme.bodyLarge?.copyWith(color: foreground),
+            ),
+          ),
+          Padding(padding: const EdgeInsets.fromLTRB(4, 4, 4, 0), child: time),
+        ],
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: mine
+            ? MainAxisAlignment.end
+            : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (!mine) ...[
+            Padding(
+              padding: const EdgeInsets.only(bottom: 20),
+              child: SizedBox(width: 32, child: avatar),
+            ),
+            const SizedBox(width: 8),
           ],
-        ),
+          Flexible(child: column),
+        ],
       ),
     );
   }
@@ -320,6 +407,8 @@ class _Composer extends StatelessWidget {
                 decoration: InputDecoration(
                   hintText: 'Votre message…',
                   counterText: '',
+                  filled: true,
+                  fillColor: RisottoColors.white,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(28),
                     borderSide: BorderSide.none,
