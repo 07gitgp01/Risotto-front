@@ -231,9 +231,28 @@ void main() {
     );
   });
 
-  test('shortTime shows the hour today and the date otherwise', () {
+  test('shortTime shows the hour, yesterday, the weekday, then the date', () {
+    // Thursday.
     final now = DateTime(2026, 3, 12, 18);
     expect(shortTime(DateTime(2026, 3, 12, 9, 5), now: now), '09:05');
+    expect(shortTime(DateTime(2026, 3, 11, 9, 5), now: now), 'Hier');
+    expect(shortTime(DateTime(2026, 3, 10, 9, 5), now: now), 'Mar.');
     expect(shortTime(DateTime(2026, 3, 1, 9, 5), now: now), '01/03');
+  });
+
+  test('relativeTime and dayLabel', () {
+    final now = DateTime(2026, 3, 12, 18);
+    expect(relativeTime(now, now: now), 'à l’instant');
+    expect(
+      relativeTime(DateTime(2026, 3, 12, 17, 55), now: now),
+      'il y a 5 min',
+    );
+    expect(relativeTime(DateTime(2026, 3, 12, 16), now: now), 'il y a 2 h');
+    expect(relativeTime(DateTime(2026, 3, 11, 23), now: now), 'hier');
+    expect(relativeTime(DateTime(2026, 3, 9, 9), now: now), 'il y a 3 jours');
+    expect(relativeTime(DateTime(2026, 2, 1), now: now), '01/02/2026');
+    expect(dayLabel(DateTime(2026, 3, 12, 9), now: now), 'Aujourd’hui');
+    expect(dayLabel(DateTime(2026, 3, 11, 9), now: now), 'Hier');
+    expect(dayLabel(DateTime(2026, 3, 1, 9), now: now), '1 mars 2026');
   });
 }

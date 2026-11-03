@@ -7,7 +7,7 @@ import '../../../core/router/app_routes.dart';
 import '../../../core/theme/risotto_colors.dart';
 import '../../../core/widgets/risotto_ui.dart';
 import '../../connections/application/connections_providers.dart';
-import '../../messaging/data/messaging_repository.dart';
+import '../../messaging/application/open_chat.dart';
 import '../../profile/data/profile_models.dart';
 import '../../profile/presentation/widgets/profile_avatar.dart';
 import '../application/contacts_providers.dart';
@@ -100,19 +100,6 @@ class _ScanResultScreenState extends ConsumerState<ScanResultScreen> {
       if (mounted) {
         setState(() => _saving = false);
       }
-    }
-  }
-
-  Future<void> _write() async {
-    try {
-      final conversation = await ref
-          .read(messagingRepositoryProvider)
-          .start(widget.result.card.userId);
-      if (mounted) {
-        await context.push(AppRoutes.chat(conversation.id));
-      }
-    } on ApiException catch (error) {
-      _say(error.message);
     }
   }
 
@@ -314,7 +301,8 @@ class _ScanResultScreenState extends ConsumerState<ScanResultScreen> {
               TextButton.icon(
                 icon: const Icon(Icons.chat_bubble_outline),
                 label: const Text('Écrire un message'),
-                onPressed: _write,
+                onPressed: () =>
+                    openChatWith(context, ref, widget.result.card.userId),
               ),
             ],
           ],
