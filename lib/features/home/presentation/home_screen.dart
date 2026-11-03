@@ -12,9 +12,10 @@ import '../../connections/data/connections_models.dart';
 import '../../connections/presentation/widgets/connection_button.dart';
 import '../../dashboard/application/dashboard_provider.dart';
 import '../../dashboard/data/dashboard_models.dart';
-import '../../messaging/data/messaging_repository.dart';
+import '../../messaging/application/open_chat.dart';
 import '../../messaging/presentation/time_format.dart';
 import '../../notifications/presentation/notification_routes.dart';
+import '../../notifications/presentation/widgets/actor_avatar.dart';
 import '../../profile/application/my_profile_controller.dart';
 import '../../profile/data/profile_models.dart';
 import '../../profile/presentation/widgets/profile_avatar.dart';
@@ -106,7 +107,10 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   const SizedBox(height: 12),
                 ],
-              const SectionHeader(title: 'Activité récente'),
+              const SectionHeader(
+                title: 'Activité récente',
+                trailing: StatusPill('Temps réel', icon: Icons.circle),
+              ),
               if (summary.recentActivity.isEmpty)
                 const _EmptyLine(
                   'Rien de neuf pour l’instant. Partagez votre carte pour agrandir votre réseau.',
@@ -306,24 +310,6 @@ class _RequestCard extends StatelessWidget {
 class _RecentContacts extends ConsumerWidget {
   const _RecentContacts();
 
-  Future<void> _write(
-    BuildContext context,
-    WidgetRef ref,
-    String userId,
-  ) async {
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      final conversation = await ref
-          .read(messagingRepositoryProvider)
-          .start(userId);
-      if (context.mounted) {
-        await context.push(AppRoutes.chat(conversation.id));
-      }
-    } on ApiException catch (error) {
-      messenger.showSnackBar(SnackBar(content: Text(error.message)));
-    }
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final connections = ref.watch(myConnectionsProvider).value ?? const [];
@@ -376,7 +362,8 @@ class _RecentContacts extends ConsumerWidget {
                       ),
                       const Spacer(),
                       FilledButton.tonalIcon(
-                        onPressed: () => _write(context, ref, user.userId),
+                        onPressed: () =>
+                            openChatWith(context, ref, user.userId),
                         style: FilledButton.styleFrom(
                           backgroundColor: RisottoColors.basilSoft,
                           foregroundColor: RisottoColors.basil,
@@ -408,8 +395,8 @@ class _ActivityCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return SurfaceCard(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       onTap: () {
         final route = routeForNotification(item.kind, {
           ...item.data,
@@ -419,10 +406,22 @@ class _ActivityCard extends StatelessWidget {
           openRoute(GoRouter.of(context), route);
         }
       },
-      child: _PersonRow(
-        profile: item.actor,
-        title: item.text,
-        subtitle: shortTime(item.at),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ActorAvatar(actor: item.actor, kind: item.kind),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(item.text, style: theme.textTheme.bodyLarge),
+                const SizedBox(height: 2),
+                Text(relativeTime(item.at), style: theme.textTheme.labelMedium),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -431,13 +430,11 @@ class _ActivityCard extends StatelessWidget {
 class _PersonRow extends StatelessWidget {
   const _PersonRow({
     required this.profile,
-    this.title,
     this.subtitle,
     this.trailing,
   });
 
   final Profile profile;
-  final String? title;
   final String? subtitle;
   final Widget? trailing;
 
@@ -450,7 +447,7 @@ class _PersonRow extends StatelessWidget {
       name: profile.fullName,
       radius: 22,
     ),
-    title: Text(title ?? profile.fullName),
+    title: Text(profile.fullName),
     subtitle: subtitle == null
         ? null
         : Text(subtitle!, maxLines: 1, overflow: TextOverflow.ellipsis),

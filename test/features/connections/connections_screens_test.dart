@@ -78,7 +78,10 @@ void main() {
       connections.addIncoming(bob, message: 'Rencontrés au salon');
       await start(tester);
       await openTab(tester, 'Réseau');
-      await tapText(tester, 'Demandes (1)');
+      // The pending request is shown first on the Relations tab too.
+      expect(find.text('Demandes en attente (1)'), findsOneWidget);
+      await tester.tap(find.text('Demandes'));
+      await tester.pumpAndSettle();
 
       expect(find.text('« Rencontrés au salon »'), findsOneWidget);
       await tapText(tester, 'Accepter');
@@ -90,20 +93,19 @@ void main() {
       );
       await tapText(tester, 'Relations (1)');
       expect(find.text('Bob Durand'), findsOneWidget);
+      expect(find.byTooltip('Écrire à Bob'), findsOneWidget);
     });
 
     testWidgets('declines an incoming request', (tester) async {
       connections.addIncoming(carol);
       await start(tester);
       await openTab(tester, 'Réseau');
-      await tapText(tester, 'Demandes (1)');
+      await tester.tap(find.text('Demandes'));
+      await tester.pumpAndSettle();
       await tapText(tester, 'Refuser');
 
       expect(connections.calls, contains('decline'));
-      expect(
-        find.textContaining('Vous n’avez pas de demande en attente'),
-        findsOneWidget,
-      );
+      expect(find.text('À jour !'), findsOneWidget);
     });
 
     testWidgets('removing a connection asks for confirmation', (tester) async {

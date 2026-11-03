@@ -12,10 +12,10 @@ import '../../connections/data/connections_models.dart';
 import '../../connections/presentation/widgets/connection_button.dart';
 import '../../messaging/presentation/time_format.dart';
 import '../../profile/data/profile_models.dart';
-import '../../profile/presentation/widgets/profile_avatar.dart';
 import '../application/notifications_providers.dart';
 import '../data/notifications_models.dart';
 import 'notification_routes.dart';
+import 'widgets/actor_avatar.dart';
 
 enum _Filter { all, network, messages }
 
@@ -263,27 +263,18 @@ class _NotificationTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final actor = notification.actor;
-    final (pill, tone, badge) = switch (notification.kind) {
+    final badge = notificationIcon(notification.kind);
+    final (pill, tone) = switch (notification.kind) {
       NotificationKind.connectionRequest => (
         'Nouvelle demande',
         PillTone.saffron,
-        Icons.person_add_alt_1,
       ),
       NotificationKind.connectionAccepted => (
         'Nouvelle relation',
         PillTone.basil,
-        Icons.handshake_outlined,
       ),
-      NotificationKind.message => (
-        'Message',
-        PillTone.neutral,
-        Icons.chat_bubble_outline,
-      ),
-      NotificationKind.unknown => (
-        'Risotto',
-        PillTone.neutral,
-        Icons.notifications_outlined,
-      ),
+      NotificationKind.message => ('Message', PillTone.neutral),
+      NotificationKind.unknown => ('Risotto', PillTone.neutral),
     };
     // Accept / decline right here while the request is still pending.
     final pending = notification.kind == NotificationKind.connectionRequest
@@ -311,36 +302,10 @@ class _NotificationTile extends ConsumerWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    if (actor == null)
-                      IconTile(badge, tone: tone)
-                    else
-                      ProfileAvatar(
-                        initials: actor.initials,
-                        photoUrl: actor.photoUrl,
-                        name: actor.fullName,
-                        radius: 24,
-                      ),
-                    if (actor != null)
-                      Positioned(
-                        right: -4,
-                        bottom: -4,
-                        child: ExcludeSemantics(
-                          child: CircleAvatar(
-                            radius: 10,
-                            backgroundColor: Colors.white,
-                            child: Icon(
-                              badge,
-                              size: 13,
-                              color: RisottoColors.basil,
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+                if (actor == null)
+                  IconTile(badge, tone: tone)
+                else
+                  ActorAvatar(actor: actor, kind: notification.kind),
                 const SizedBox(width: 12),
                 Expanded(
                   child: Column(
