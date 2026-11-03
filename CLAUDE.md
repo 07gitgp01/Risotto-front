@@ -62,6 +62,8 @@ flutter run --dart-define=API_BASE_URL=http://localhost:3000/api  # simulateur i
 flutter build apk --debug
 # Téléphone réel en USB : adb reverse tcp:3000 tcp:3000, puis
 flutter build apk --debug --dart-define=API_BASE_URL=http://127.0.0.1:3000/api
+# API hébergée sur Render (voir Risotto-back/docs/DEPLOY_RENDER.md), APK léger pour téléphone arm64 :
+flutter build apk --release --target-platform android-arm64 --dart-define=API_BASE_URL=https://risotto-api.onrender.com/api
 ```
 - Identifiants d'application : `com.risotto.risotto` (Android et iOS).
 - Riverpod 3 : `Provider` / `FutureProvider` / `Notifier` ; tests via `ProviderScope(overrides: [...overrideWithValue(fake)])`.
