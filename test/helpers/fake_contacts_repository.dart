@@ -3,7 +3,7 @@ import 'package:risotto/core/network/api_exception.dart';
 import 'package:risotto/features/contacts/application/contacts_providers.dart';
 import 'package:risotto/features/contacts/data/contacts_models.dart';
 import 'package:risotto/features/contacts/data/contacts_repository.dart';
-import 'package:risotto/features/contacts/presentation/scan_screen.dart';
+import 'package:risotto/features/contacts/application/qr_scanner.dart';
 
 const myCardFixture = ContactCard(
   userId: 'user-1',
@@ -95,15 +95,30 @@ class FakeCardSharer implements CardSharer {
       shared.add(card);
 }
 
-/// Replaces the camera: a button per payload to "scan".
-QrScannerBuilder fakeScanner(List<String> payloads) =>
-    (context, onPayload) => Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        for (final payload in payloads)
-          ElevatedButton(
-            onPressed: () => onPayload(payload),
-            child: Text('scan:$payload'),
-          ),
-      ],
-    );
+/// Replaces the camera: a button per payload to "scan". The gallery returns
+/// [galleryResult] and the torch only counts its toggles.
+class FakeQrScanner implements QrScanner {
+  FakeQrScanner(this.payloads);
+
+  final List<String> payloads;
+  GalleryScan? galleryResult;
+  int torchToggles = 0;
+
+  @override
+  Widget view(BuildContext context, ValueChanged<String> onPayload) => Column(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: [
+      for (final payload in payloads)
+        ElevatedButton(
+          onPressed: () => onPayload(payload),
+          child: Text('scan:$payload'),
+        ),
+    ],
+  );
+
+  @override
+  Future<void> toggleTorch() async => torchToggles++;
+
+  @override
+  Future<GalleryScan?> scanFromGallery() async => galleryResult;
+}

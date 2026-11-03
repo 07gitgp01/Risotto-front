@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:risotto/features/contacts/application/qr_scanner.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:risotto/features/contacts/data/contacts_models.dart';
 
@@ -19,12 +20,14 @@ void main() {
   Future<void> start(
     WidgetTester tester, {
     List<String> scannerPayloads = const [],
+    FakeQrScanner? scanner,
   }) => pumpRisottoApp(
     tester,
     storage: InMemorySessionStorage(testSession()),
     contacts: contacts,
     cardSharer: sharer,
     scannerPayloads: scannerPayloads,
+    scanner: scanner,
   );
 
   group('my card', () {
@@ -76,6 +79,56 @@ void main() {
       expect(contacts.calls, contains('scanAndSave'));
       expect(find.text('Voir dans mes contacts'), findsOneWidget);
       expect(contacts.saved.single.card.userId, 'bob');
+    });
+
+    testWidgets('the meeting context is saved with the contact', (
+      tester,
+    ) async {
+      contacts.scannable[validPayload] = bobCard;
+      await start(tester, scannerPayloads: [validPayload]);
+      await openMyCard(tester);
+      await tapText(tester, 'Scanner un code');
+      await tapText(tester, 'scan:$validPayload');
+
+      expect(find.text('Contexte de rencontre'), findsOneWidget);
+      await tester.enterText(find.byType(TextField), 'Salon de Lyon');
+      await tapText(tester, 'Enregistrer le contact');
+
+      expect(contacts.calls, containsAllInOrder(['scanAndSave', 'updateNote']));
+      expect(contacts.saved.single.note, 'Salon de Lyon');
+    });
+
+    testWidgets('reads a QR code from a gallery image', (tester) async {
+      contacts.scannable[validPayload] = bobCard;
+      final scanner = FakeQrScanner(const [])
+        ..galleryResult = const GalleryScan(null);
+      await start(tester, scanner: scanner);
+      await openMyCard(tester);
+      await tapText(tester, 'Scanner un code');
+
+      await tapText(tester, 'Galerie');
+      expect(
+        find.text('Aucun QR code trouvé dans cette image.'),
+        findsOneWidget,
+      );
+
+      scanner.galleryResult = GalleryScan(validPayload);
+      await tapText(tester, 'Galerie');
+      expect(find.text('Résultat du scan'), findsOneWidget);
+      expect(find.text('Bob Durand'), findsOneWidget);
+    });
+
+    testWidgets('the torch can be switched on and off', (tester) async {
+      final scanner = FakeQrScanner(const []);
+      await start(tester, scanner: scanner);
+      await openMyCard(tester);
+      await tapText(tester, 'Scanner un code');
+
+      await tapText(tester, 'Lampe');
+      expect(scanner.torchToggles, 1);
+      expect(find.text('Éteindre'), findsOneWidget);
+      await tapText(tester, 'Éteindre');
+      expect(scanner.torchToggles, 2);
     });
 
     testWidgets('a foreign QR code is rejected without calling the API', (

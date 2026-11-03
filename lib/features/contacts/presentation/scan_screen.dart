@@ -1,50 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../../../core/router/app_routes.dart';
-import '../../connections/application/connections_providers.dart';
-import '../../profile/data/profile_models.dart';
-import '../application/contacts_providers.dart';
+import '../../../core/theme/risotto_colors.dart';
+import '../../../core/widgets/risotto_ui.dart';
+import '../application/qr_scanner.dart';
 import '../data/contacts_models.dart';
 import '../data/contacts_repository.dart';
-import 'widgets/contact_card_view.dart';
-import '../../../core/widgets/risotto_ui.dart';
+import 'scan_result_screen.dart';
 
-/// Builds the camera view; calls [onPayload] for every decoded QR code.
-/// Replaced by a fake in widget tests (no camera there).
-typedef QrScannerBuilder =
-    Widget Function(BuildContext context, ValueChanged<String> onPayload);
-
-final qrScannerBuilderProvider = Provider<QrScannerBuilder>(
-  (ref) =>
-      (context, onPayload) => MobileScanner(
-        controller: MobileScannerController(
-          formats: const [BarcodeFormat.qrCode],
-        ),
-        onDetect: (capture) {
-          final value = capture.barcodes.firstOrNull?.rawValue;
-          if (value != null) {
-            onPayload(value);
-          }
-        },
-        errorBuilder: (context, error) => Center(
-          child: Padding(
-            padding: const EdgeInsets.all(24),
-            child: Text(
-              error.errorCode == MobileScannerErrorCode.permissionDenied
-                  ? 'Autorisez l’accès à l’appareil photo dans les réglages pour scanner un QR code.'
-                  : 'Caméra indisponible.',
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ),
-      ),
-);
-
+/// Design: scanner_qr.
 class ScanScreen extends ConsumerStatefulWidget {
   const ScanScreen({super.key});
 
@@ -55,21 +22,20 @@ class ScanScreen extends ConsumerStatefulWidget {
 class _ScanScreenState extends ConsumerState<ScanScreen> {
   // The camera reports the same code many times per second.
   bool _busy = false;
-  bool _sheetOpen = false;
+  bool _resultOpen = false;
+  bool _torchOn = false;
   String? _lastPayload;
 
+  void _say(String text) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+
   Future<void> _onPayload(String payload) async {
-    if (_busy || _sheetOpen || payload == _lastPayload) {
+    if (_busy || _resultOpen || payload == _lastPayload) {
       return;
     }
     _lastPayload = payload;
-    final messenger = ScaffoldMessenger.of(context);
     if (!looksLikeRisottoQr(payload)) {
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Ce QR code n’est pas un QR code Risotto.'),
-        ),
-      );
+      _say('Ce QR code n’est pas un QR code Risotto.');
       return;
     }
 
@@ -78,14 +44,8 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
     try {
       result = await ref.read(contactsRepositoryProvider).scan(payload);
     } on ApiException catch (error) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            error.statusCode == 404
-                ? 'QR code inconnu ou expiré.'
-                : error.message,
-          ),
-        ),
+      _say(
+        error.statusCode == 404 ? 'QR code inconnu ou expiré.' : error.message,
       );
     } finally {
       if (mounted) {
@@ -97,186 +57,278 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       return;
     }
 
-    _sheetOpen = true;
-    await showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => _ScannedCardSheet(payload: payload, result: result!),
+    _resultOpen = true;
+    await Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => ScanResultScreen(payload: payload, result: result!),
+      ),
     );
-    _sheetOpen = false;
-    // Allows scanning the same code again after closing the sheet.
+    _resultOpen = false;
+    // Allows scanning the same code again after coming back.
     _lastPayload = null;
+  }
+
+  Future<void> _toggleTorch() async {
+    try {
+      await ref.read(qrScannerProvider).toggleTorch();
+      setState(() => _torchOn = !_torchOn);
+    } on Object {
+      _say('Lampe indisponible sur cet appareil.');
+    }
+  }
+
+  Future<void> _fromGallery() async {
+    GalleryScan? scan;
+    try {
+      scan = await ref.read(qrScannerProvider).scanFromGallery();
+    } on Object {
+      _say('Impossible de lire cette image.');
+      return;
+    }
+    if (scan == null || !mounted) {
+      return;
+    }
+    final payload = scan.payload;
+    if (payload == null) {
+      _say('Aucun QR code trouvé dans cette image.');
+      return;
+    }
+    // An image is a deliberate choice: always read it, even if seen before.
+    _lastPayload = null;
+    await _onPayload(payload);
   }
 
   @override
   Widget build(BuildContext context) {
-    final scanner = ref.watch(qrScannerBuilderProvider);
+    final scanner = ref.watch(qrScannerProvider);
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(title: const Text('Scanner un QR code')),
-      body: Stack(
-        fit: StackFit.expand,
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          scanner(context, _onPayload),
-          IgnorePointer(
-            child: Center(
-              child: Container(
-                width: 240,
-                height: 240,
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 4,
-                  ),
-                  borderRadius: BorderRadius.circular(24),
+          Row(
+            children: [
+              const IconTile(Icons.qr_code_scanner),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Connexion instantanée',
+                      style: theme.textTheme.titleMedium,
+                    ),
+                    const Text('Scannez la carte Risotto d’un membre'),
+                  ],
+                ),
+              ),
+              ActionChip(
+                avatar: Icon(
+                  _torchOn ? Icons.flashlight_off : Icons.flashlight_on,
+                  size: 18,
+                ),
+                label: Text(_torchOn ? 'Éteindre' : 'Lampe'),
+                onPressed: _toggleTorch,
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(24),
+            child: SizedBox(
+              height: 340,
+              child: ColoredBox(
+                color: RisottoColors.charcoal,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    scanner.view(context, _onPayload),
+                    const IgnorePointer(child: _Viewfinder()),
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 16,
+                      child: IgnorePointer(
+                        child: Center(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: RisottoColors.charcoal.withValues(
+                                alpha: 0.75,
+                              ),
+                              borderRadius: BorderRadius.circular(999),
+                            ),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.circle,
+                                  size: 10,
+                                  color: RisottoColors.basilSoft,
+                                ),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Caméra active',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (_busy) const PageLoading(),
+                  ],
                 ),
               ),
             ),
           ),
-          if (_busy) const PageLoading(),
+          const SizedBox(height: 20),
+          Text(
+            'Placez le QR code dans le cadre',
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleLarge,
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Le scan est automatique. Vous pourrez ensuite vous connecter '
+            'au membre ou enregistrer sa carte.',
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          SurfaceCard(
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: _ToolTile(
+                        icon: Icons.flashlight_on_outlined,
+                        tone: PillTone.saffron,
+                        title: 'Éclairage',
+                        subtitle: _torchOn
+                            ? 'Éteindre la lampe'
+                            : 'Allumer la lampe',
+                        onTap: _toggleTorch,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _ToolTile(
+                        icon: Icons.photo_library_outlined,
+                        tone: PillTone.basil,
+                        title: 'Galerie',
+                        subtitle: 'Importer une image',
+                        onTap: _fromGallery,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    icon: const Icon(Icons.qr_code_2),
+                    label: const Text('Afficher mon code'),
+                    onPressed: () => context.pushReplacement(AppRoutes.myCard),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          const InfoPanel(
+            icon: Icons.verified_user_outlined,
+            text:
+                'Seuls les QR codes Risotto sont reconnus, et chacun est '
+                'vérifié par nos serveurs avant d’afficher une carte.',
+          ),
         ],
       ),
     );
   }
 }
 
-class _ScannedCardSheet extends ConsumerStatefulWidget {
-  const _ScannedCardSheet({required this.payload, required this.result});
-
-  final String payload;
-  final ScanResult result;
-
-  @override
-  ConsumerState<_ScannedCardSheet> createState() => _ScannedCardSheetState();
-}
-
-class _ScannedCardSheetState extends ConsumerState<_ScannedCardSheet> {
-  late bool _saved = widget.result.saved;
-  late ConnectionStatus _connection = widget.result.connection.status;
-  bool _saving = false;
-  bool _connecting = false;
-
-  /// Via the QR payload: works even if the profile is private.
-  Future<void> _connect() async {
-    setState(() => _connecting = true);
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      final connection = await ref
-          .read(connectionActionsProvider)
-          .request(qrPayload: widget.payload);
-      final accepted = connection.status == 'accepted';
-      if (mounted) {
-        setState(
-          () => _connection = accepted
-              ? ConnectionStatus.connected
-              : ConnectionStatus.pendingOutgoing,
-        );
-      }
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            accepted
-                ? 'Vous êtes maintenant en relation.'
-                : 'Demande de mise en relation envoyée.',
-          ),
-        ),
-      );
-    } on ApiException catch (error) {
-      messenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            error.kind == ApiErrorKind.conflict
-                ? 'Une demande existe déjà ou a été refusée récemment.'
-                : error.message,
-          ),
-        ),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _connecting = false);
-      }
-    }
-  }
-
-  Future<void> _save() async {
-    setState(() => _saving = true);
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      await ref
-          .read(contactsRepositoryProvider)
-          .scan(widget.payload, saveContact: true);
-      ref.invalidate(savedContactsProvider);
-      if (mounted) {
-        setState(() => _saved = true);
-      }
-      messenger.showSnackBar(
-        const SnackBar(content: Text('Contact enregistré.')),
-      );
-    } on ApiException catch (error) {
-      messenger.showSnackBar(SnackBar(content: Text(error.message)));
-    } finally {
-      if (mounted) {
-        setState(() => _saving = false);
-      }
-    }
-  }
+/// Saffron corners around the scanning area.
+class _Viewfinder extends StatelessWidget {
+  const _Viewfinder();
 
   @override
   Widget build(BuildContext context) {
-    final result = widget.result;
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    const side = BorderSide(color: RisottoColors.saffron, width: 5);
+    Widget corner(Alignment alignment, Border border) => Align(
+      alignment: alignment,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(border: border),
+      ),
+    );
+    return Center(
+      child: SizedBox(
+        width: 220,
+        height: 220,
+        child: Stack(
           children: [
-            ContactCardView(card: result.card),
-            const SizedBox(height: 16),
-            if (!result.isSelf) ...[
-              switch (_connection) {
-                ConnectionStatus.none => FilledButton.icon(
-                  icon: const Icon(Icons.handshake_outlined),
-                  label: const Text('Se connecter'),
-                  onPressed: _connecting ? null : _connect,
-                ),
-                ConnectionStatus.pendingOutgoing => const Text(
-                  'Demande de mise en relation envoyée.',
-                  textAlign: TextAlign.center,
-                ),
-                ConnectionStatus.pendingIncoming => FilledButton.icon(
-                  icon: const Icon(Icons.check),
-                  label: const Text('Accepter sa demande'),
-                  onPressed: _connecting ? null : _connect,
-                ),
-                ConnectionStatus.connected => const Text(
-                  'Vous êtes en relation.',
-                  textAlign: TextAlign.center,
-                ),
-              },
-              const SizedBox(height: 12),
-            ],
-            if (result.isSelf)
-              const Text(
-                'C’est votre propre QR code.',
-                textAlign: TextAlign.center,
-              )
-            else if (_saved)
-              OutlinedButton.icon(
-                icon: const Icon(Icons.check),
-                label: const Text('Voir dans mes contacts'),
-                onPressed: () {
-                  Navigator.pop(context);
-                  context.push(AppRoutes.contacts);
-                },
-              )
-            else
-              OutlinedButton.icon(
-                icon: const Icon(Icons.person_add_alt_1),
-                label: const Text('Enregistrer le contact'),
-                onPressed: _saving ? null : _save,
-              ),
+            corner(Alignment.topLeft, const Border(top: side, left: side)),
+            corner(Alignment.topRight, const Border(top: side, right: side)),
+            corner(
+              Alignment.bottomLeft,
+              const Border(bottom: side, left: side),
+            ),
+            corner(
+              Alignment.bottomRight,
+              const Border(bottom: side, right: side),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class _ToolTile extends StatelessWidget {
+  const _ToolTile({
+    required this.icon,
+    required this.tone,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final PillTone tone;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Material(
+      color: RisottoColors.cream,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+          child: Column(
+            children: [
+              IconTile(icon, tone: tone),
+              const SizedBox(height: 8),
+              Text(title, style: theme.textTheme.titleSmall),
+              Text(
+                subtitle,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.labelMedium,
+              ),
+            ],
+          ),
         ),
       ),
     );

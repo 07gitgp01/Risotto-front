@@ -170,7 +170,7 @@ void main() {
     await openMyCard(tester);
     await tapText(tester, 'Scanner un code');
     await tapText(tester, 'scan:$validPayload');
-    await tapText(tester, 'Se connecter');
+    await tapText(tester, 'Envoyer une demande');
 
     expect(connections.lastArgs['qrPayload'], validPayload);
     expect(find.text('Demande de mise en relation envoyée.'), findsWidgets);
