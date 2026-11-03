@@ -31,32 +31,40 @@ class BlockedUsersScreen extends ConsumerWidget {
                 ),
               )
             : ListView.separated(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
                 itemCount: users.length,
-                separatorBuilder: (_, _) => const Divider(height: 1),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final user = users[index];
-                  return ListTile(
-                    leading: const Icon(Icons.block),
-                    title: Text(user.displayName),
-                    trailing: TextButton(
-                      onPressed: () async {
-                        final messenger = ScaffoldMessenger.of(context);
-                        try {
-                          await ref
-                              .read(connectionActionsProvider)
-                              .unblock(user.userId);
-                          messenger.showSnackBar(
-                            SnackBar(
-                              content: Text('${user.displayName} débloqué.'),
-                            ),
-                          );
-                        } on ApiException catch (error) {
-                          messenger.showSnackBar(
-                            SnackBar(content: Text(error.message)),
-                          );
-                        }
-                      },
-                      child: const Text('Débloquer'),
+                  return SurfaceCard(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: ListTile(
+                      leading: const IconTile(
+                        Icons.block,
+                        tone: PillTone.tomato,
+                        size: 40,
+                      ),
+                      title: Text(user.displayName),
+                      trailing: TextButton(
+                        onPressed: () async {
+                          final messenger = ScaffoldMessenger.of(context);
+                          try {
+                            await ref
+                                .read(connectionActionsProvider)
+                                .unblock(user.userId);
+                            messenger.showSnackBar(
+                              SnackBar(
+                                content: Text('${user.displayName} débloqué.'),
+                              ),
+                            );
+                          } on ApiException catch (error) {
+                            messenger.showSnackBar(
+                              SnackBar(content: Text(error.message)),
+                            );
+                          }
+                        },
+                        child: const Text('Débloquer'),
+                      ),
                     ),
                   );
                 },
