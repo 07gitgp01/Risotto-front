@@ -64,6 +64,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return AuthFormScaffold(
+      onBack: () => context.go(AppRoutes.welcome),
       appBarTitle: 'Connexion',
       title: 'Ravi de vous revoir !',
       subtitle: 'Connectez-vous pour retrouver vos contacts et votre réseau.',

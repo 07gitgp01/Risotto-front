@@ -12,6 +12,8 @@ class AuthFormScaffold extends StatelessWidget {
     this.subtitle,
     this.appBarTitle,
     this.showBackButton = false,
+    this.onBack,
+    this.header,
     this.footer,
     super.key,
   });
@@ -24,6 +26,12 @@ class AuthFormScaffold extends StatelessWidget {
   final String? appBarTitle;
   final bool showBackButton;
 
+  /// Back arrow for screens reached with `go` (nothing to pop).
+  final VoidCallback? onBack;
+
+  /// Above the card (e.g. the registration step).
+  final Widget? header;
+
   /// Below the card (e.g. "Créer un compte" link).
   final Widget? footer;
 
@@ -33,6 +41,13 @@ class AuthFormScaffold extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: showBackButton,
+        leading: onBack == null
+            ? null
+            : IconButton(
+                tooltip: 'Retour',
+                onPressed: onBack,
+                icon: const Icon(Icons.arrow_back),
+              ),
         title: Row(
           children: [
             const RisottoLogo(size: 28),
@@ -52,6 +67,7 @@ class AuthFormScaffold extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  if (header != null) ...[header!, const SizedBox(height: 16)],
                   SurfaceCard(
                     padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
                     child: Column(

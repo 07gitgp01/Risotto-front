@@ -4,10 +4,12 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/network/api_exception.dart';
 import '../../../core/router/app_routes.dart';
+import '../../../core/widgets/risotto_ui.dart';
 import '../application/auth_controller.dart';
 import '../application/auth_validators.dart';
 import 'widgets/auth_form_scaffold.dart';
 import 'widgets/password_field.dart';
+import 'widgets/password_strength.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -63,6 +65,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     return AuthFormScaffold(
       appBarTitle: 'Inscription',
+      onBack: () => context.go(AppRoutes.welcome),
+      header: const Align(
+        alignment: Alignment.centerLeft,
+        child: StatusPill(
+          'Étape 1 sur 2 : votre compte',
+          icon: Icons.badge_outlined,
+          uppercase: true,
+        ),
+      ),
       title: 'Créer un compte',
       subtitle:
           'Quelques secondes pour rejoindre le réseau et partager votre carte.',
@@ -92,12 +103,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 textInputAction: TextInputAction.next,
                 validator: AuthValidators.newPassword,
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8, left: 12),
-                child: Text(
-                  '8 caractères minimum, avec au moins une lettre et un chiffre.',
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
+              const SizedBox(height: 8),
+              ValueListenableBuilder(
+                valueListenable: _password,
+                builder: (context, value, _) =>
+                    PasswordStrengthMeter(password: value.text),
               ),
               const SizedBox(height: 16),
               PasswordField(
@@ -106,6 +116,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 autofillHints: const [AutofillHints.newPassword],
                 validator: AuthValidators.confirmation(() => _password.text),
                 onSubmitted: (_) => _submit(),
+              ),
+              const SizedBox(height: 16),
+              const InfoPanel(
+                icon: Icons.lightbulb_outline,
+                text:
+                    'Étape suivante : votre profil (nom, poste, photo). '
+                    'Vous pourrez le compléter à tout moment.',
               ),
               const SizedBox(height: 24),
               if (_error != null) ...[

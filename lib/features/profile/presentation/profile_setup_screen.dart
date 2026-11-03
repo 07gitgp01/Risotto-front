@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/network/api_exception.dart';
+import '../../../core/widgets/risotto_ui.dart';
 import '../../auth/presentation/widgets/auth_form_scaffold.dart';
 import '../application/my_profile_controller.dart';
 import '../application/profile_validators.dart';
@@ -64,6 +65,15 @@ class _ProfileSetupScreenState extends ConsumerState<ProfileSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return AuthFormScaffold(
+      appBarTitle: 'Inscription',
+      header: const Align(
+        alignment: Alignment.centerLeft,
+        child: StatusPill(
+          'Étape 2 sur 2 : votre profil',
+          icon: Icons.person_outline,
+          uppercase: true,
+        ),
+      ),
       title: 'Votre profil',
       subtitle:
           'Présentez-vous en quelques mots. Vous pourrez tout compléter plus tard.',

@@ -32,6 +32,15 @@ void main() {
       expect(find.text('Créer un compte'), findsOneWidget);
     });
 
+    testWidgets('the welcome slides can be swiped', (tester) async {
+      await pumpRisottoApp(tester, auth: auth, storage: storage);
+      await tester.drag(find.byType(PageView), const Offset(-500, 0));
+      await tester.pumpAndSettle();
+      expect(find.text('Développez votre réseau'), findsOneWidget);
+      // The actions stay available on every slide.
+      expect(find.text('Commencer'), findsOneWidget);
+    });
+
     testWidgets('the welcome screen leads to the login form', (tester) async {
       await start(tester);
       expect(find.text('Ravi de vous revoir !'), findsOneWidget);
@@ -117,6 +126,17 @@ void main() {
       await start(tester);
       await tapText(tester, 'Créer un compte');
     }
+
+    testWidgets('shows the step and the password strength', (tester) async {
+      await openRegister(tester);
+      expect(find.text('ÉTAPE 1 SUR 2 : VOTRE COMPTE'), findsOneWidget);
+      await enterField(tester, 'Mot de passe', 'risotto1');
+      await tester.pump();
+      expect(find.text('Moyen'), findsOneWidget);
+      await enterField(tester, 'Mot de passe', 'Risotto1!');
+      await tester.pump();
+      expect(find.text('Fort'), findsOneWidget);
+    });
 
     testWidgets('applies the password policy and confirmation', (tester) async {
       await openRegister(tester);

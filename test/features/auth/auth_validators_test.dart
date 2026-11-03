@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:risotto/features/auth/application/auth_validators.dart';
+import 'package:risotto/features/auth/presentation/widgets/password_strength.dart';
 
 void main() {
   group('email', () {
@@ -47,5 +48,13 @@ void main() {
     expect(AuthValidators.resetCode('042517'), isNull);
     expect(AuthValidators.resetCode('12345'), isNotNull);
     expect(AuthValidators.resetCode('12345a'), isNotNull);
+  });
+
+  test('passwordStrength grades the policy and the extras', () {
+    expect(passwordStrength(''), PasswordStrength.none);
+    expect(passwordStrength('short1'), PasswordStrength.weak);
+    expect(passwordStrength('risotto1'), PasswordStrength.medium);
+    expect(passwordStrength('Risotto1!'), PasswordStrength.strong);
+    expect(passwordStrength('risotto1risotto!'), PasswordStrength.strong);
   });
 }
