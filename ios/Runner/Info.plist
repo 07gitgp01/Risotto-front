@@ -45,6 +45,8 @@
 		<true/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
+		<key>NSFaceIDUsageDescription</key>
+		<string>Face ID permet de déverrouiller Risotto.</string>
 		<key>NSCameraUsageDescription</key>
 		<string>Risotto utilise l’appareil photo pour votre photo de profil et pour scanner les QR codes.</string>
 		<key>NSPhotoLibraryUsageDescription</key>

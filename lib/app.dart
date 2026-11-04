@@ -7,7 +7,9 @@ import 'core/offline/connectivity.dart';
 import 'core/router/app_router.dart';
 import 'core/router/open_route.dart';
 import 'core/theme/risotto_theme.dart';
+import 'features/auth/application/app_lock.dart';
 import 'features/auth/application/auth_controller.dart';
+import 'features/auth/presentation/app_lock_screen.dart';
 import 'features/dashboard/application/dashboard_provider.dart';
 import 'features/messaging/application/messaging_providers.dart';
 import 'features/notifications/application/notifications_providers.dart';
@@ -25,10 +27,30 @@ class RisottoApp extends ConsumerStatefulWidget {
 
 class _RisottoAppState extends ConsumerState<RisottoApp> {
   StreamSubscription<Map<String, String>>? _openedPushes;
+  late final AppLifecycleListener _lifecycle;
+  DateTime? _hiddenAt;
 
   @override
   void initState() {
     super.initState();
+    // Fingerprint lock again after a while in the background. The system
+    // prompt itself hides the app: never count that time.
+    _lifecycle = AppLifecycleListener(
+      onHide: () {
+        if (!ref.read(appLockProvider.notifier).isAuthenticating) {
+          _hiddenAt = DateTime.now();
+        }
+      },
+      onShow: () {
+        final hiddenAt = _hiddenAt;
+        _hiddenAt = null;
+        if (hiddenAt != null) {
+          ref
+              .read(appLockProvider.notifier)
+              .onResumed(DateTime.now().difference(hiddenAt));
+        }
+      },
+    );
     // Registers the device for push on every sign-in (sign-out is handled by
     // AuthController, before the session is revoked).
     ref.listenManual(authControllerProvider, (previous, next) {
@@ -50,6 +72,7 @@ class _RisottoAppState extends ConsumerState<RisottoApp> {
   @override
   void dispose() {
     unawaited(_openedPushes?.cancel());
+    _lifecycle.dispose();
     super.dispose();
   }
 
@@ -82,12 +105,31 @@ class _RisottoAppState extends ConsumerState<RisottoApp> {
       theme: buildRisottoTheme(),
       scaffoldMessengerKey: scaffoldMessengerKey,
       routerConfig: ref.watch(appRouterProvider),
-      builder: (context, child) => Column(
-        children: [
-          if (ref.watch(offlineProvider)) const _OfflineBanner(),
-          Expanded(child: child ?? const SizedBox.shrink()),
-        ],
-      ),
+      builder: (context, child) {
+        final lock = ref.watch(appLockProvider);
+        // Only a signed-in app is locked; Offstage keeps the screens' state.
+        final covered =
+            ref.watch(authControllerProvider) is Authenticated && lock.covers;
+        return Stack(
+          children: [
+            Offstage(
+              offstage: covered,
+              child: Column(
+                children: [
+                  if (ref.watch(offlineProvider)) const _OfflineBanner(),
+                  Expanded(child: child ?? const SizedBox.shrink()),
+                ],
+              ),
+            ),
+            if (covered)
+              Positioned.fill(
+                child: lock.loaded
+                    ? const AppLockScreen()
+                    : const AppLockCover(),
+              ),
+          ],
+        );
+      },
     );
   }
 }

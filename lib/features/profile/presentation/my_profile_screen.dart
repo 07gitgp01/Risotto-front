@@ -6,6 +6,7 @@ import '../../../core/network/api_exception.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/theme/risotto_colors.dart';
 import '../../../core/widgets/risotto_ui.dart';
+import '../../auth/application/app_lock.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../contacts/application/contacts_providers.dart';
 import '../../dashboard/application/dashboard_provider.dart';
@@ -136,6 +137,8 @@ class MyProfileScreen extends ConsumerWidget {
                   _LinksCard(profile: profile),
                   const SizedBox(height: 12),
                   const _ActionsRow(),
+                  const SizedBox(height: 12),
+                  const _AppLockCard(),
                   if (switch (ref.watch(authControllerProvider)) {
                     Authenticated(:final user) => user.isAdmin,
                     _ => false,
@@ -504,6 +507,61 @@ class _ActionsRow extends ConsumerWidget {
             () => context.push(AppRoutes.notificationSettings),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Fingerprint unlock, per device (asked when the app opens).
+class _AppLockCard extends ConsumerWidget {
+  const _AppLockCard();
+
+  Future<void> _toggle(
+    BuildContext context,
+    WidgetRef ref,
+    bool enabled,
+  ) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final result = await ref.read(appLockProvider.notifier).setEnabled(enabled);
+    final message = switch (result) {
+      AppLockToggleResult.unavailable =>
+        'Configurez d’abord une empreinte ou un verrouillage d’écran sur ce téléphone.',
+      AppLockToggleResult.cancelled =>
+        'Déverrouillage par empreinte non activé.',
+      AppLockToggleResult.done =>
+        enabled
+            ? 'Empreinte demandée à chaque ouverture de Risotto.'
+            : 'Déverrouillage par empreinte désactivé.',
+    };
+    messenger.showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final lock = ref.watch(appLockProvider);
+    return SurfaceCard(
+      child: MergeSemantics(
+        child: Row(
+          children: [
+            const IconTile(Icons.fingerprint, tone: PillTone.basil),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Déverrouillage par empreinte'),
+                  Text('Demandé à l’ouverture de l’application'),
+                ],
+              ),
+            ),
+            Switch(
+              value: lock.enabled,
+              onChanged: lock.loaded
+                  ? (value) => _toggle(context, ref, value)
+                  : null,
+            ),
+          ],
+        ),
       ),
     );
   }

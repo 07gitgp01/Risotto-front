@@ -6,6 +6,7 @@ import 'package:risotto/app.dart';
 import 'package:risotto/core/offline/response_cache.dart';
 import 'package:risotto/core/realtime/realtime_client.dart';
 import 'package:risotto/core/storage/session_storage.dart';
+import 'package:risotto/features/auth/application/app_lock.dart';
 import 'package:risotto/features/auth/data/auth_repository.dart';
 import 'package:risotto/features/connections/data/connections_repository.dart';
 import 'package:risotto/features/contacts/application/contacts_providers.dart';
@@ -18,6 +19,7 @@ import 'package:risotto/features/notifications/data/notifications_repository.dar
 import 'package:risotto/features/profile/application/photo_picker.dart';
 import 'package:risotto/features/profile/data/profile_repository.dart';
 
+import 'fake_app_lock.dart';
 import 'fake_auth_repository.dart';
 import 'fake_connections_repository.dart';
 import 'fake_contacts_repository.dart';
@@ -46,6 +48,8 @@ Future<void> pumpRisottoApp(
   FakePushService? push,
   FakeDashboardRepository? dashboard,
   ResponseCache? responseCache,
+  FakeBiometricAuthenticator? biometrics,
+  InMemoryAppLockSettings? appLock,
   List<Override> extraOverrides = const [],
 }) async {
   await tester.pumpWidget(
@@ -85,6 +89,12 @@ Future<void> pumpRisottoApp(
         ),
         responseCacheProvider.overrideWithValue(
           responseCache ?? MemoryResponseCache(),
+        ),
+        biometricAuthenticatorProvider.overrideWithValue(
+          biometrics ?? FakeBiometricAuthenticator(),
+        ),
+        appLockSettingsProvider.overrideWithValue(
+          appLock ?? InMemoryAppLockSettings(),
         ),
         ...extraOverrides,
       ],

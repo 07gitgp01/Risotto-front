@@ -8,6 +8,7 @@ import '../../../core/storage/session_storage.dart';
 import '../../notifications/application/push_registration.dart';
 import '../data/auth_models.dart';
 import '../data/auth_repository.dart';
+import 'app_lock.dart';
 
 sealed class AuthState {
   const AuthState();
@@ -68,6 +69,7 @@ class AuthController extends Notifier<AuthState> {
       password: password,
     );
     await _storage.save(session);
+    ref.read(appLockProvider.notifier).onSignedIn();
     state = Authenticated(session.user);
   }
 
@@ -80,6 +82,7 @@ class AuthController extends Notifier<AuthState> {
       password: password,
     );
     await _storage.save(session);
+    ref.read(appLockProvider.notifier).onSignedIn();
     state = Authenticated(session.user);
   }
 
@@ -104,6 +107,7 @@ class AuthController extends Notifier<AuthState> {
 
   /// Called by the HTTP layer when the refresh token is rejected.
   void onSessionExpired() {
+    unawaited(ref.read(appLockProvider.notifier).onSignedOut());
     state = const Unauthenticated();
   }
 
@@ -115,6 +119,7 @@ class AuthController extends Notifier<AuthState> {
     } on Object {
       // Best effort.
     }
+    await ref.read(appLockProvider.notifier).onSignedOut();
     state = const Unauthenticated();
   }
 
