@@ -97,7 +97,7 @@ class HomeScreen extends ConsumerWidget {
                     onTap: () => context.push(AppRoutes.chat(conversation.id)),
                     child: _PersonRow(
                       profile: conversation.user,
-                      subtitle: conversation.lastMessage?.body,
+                      subtitle: conversation.lastMessage?.previewText,
                       trailing: Badge(
                         label: Text('${conversation.unreadCount}'),
                         backgroundColor: RisottoColors.saffron,

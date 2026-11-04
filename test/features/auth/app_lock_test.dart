@@ -5,6 +5,18 @@ import '../../helpers/fake_app_lock.dart';
 import '../../helpers/in_memory_session_storage.dart';
 import '../../helpers/test_app.dart';
 
+/// The fingerprint switch of the Profil tab (not the presence one).
+Future<void> tapLockSwitch(WidgetTester tester) async {
+  final label = find.text('Déverrouillage par empreinte');
+  await revealFinder(tester, label);
+  await tester.tap(
+    find.descendant(
+      of: find.ancestor(of: label, matching: find.byType(Row)).first,
+      matching: find.byType(Switch),
+    ),
+  );
+}
+
 void main() {
   group('Fingerprint lock', () {
     testWidgets('can be turned on from the profile tab', (tester) async {
@@ -18,9 +30,7 @@ void main() {
       );
 
       await openTab(tester, 'Profil');
-      final toggle = find.byType(Switch);
-      await revealFinder(tester, toggle);
-      await tester.tap(toggle);
+      await tapLockSwitch(tester);
       await tester.pumpAndSettle();
 
       expect(settings.enabled, isTrue);
@@ -41,9 +51,7 @@ void main() {
       );
 
       await openTab(tester, 'Profil');
-      final toggle = find.byType(Switch);
-      await revealFinder(tester, toggle);
-      await tester.tap(toggle);
+      await tapLockSwitch(tester);
       await tester.pumpAndSettle();
 
       expect(settings.enabled, isFalse);

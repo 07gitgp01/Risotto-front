@@ -10,6 +10,7 @@ import '../../auth/application/app_lock.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../contacts/application/contacts_providers.dart';
 import '../../dashboard/application/dashboard_provider.dart';
+import '../../messaging/application/messaging_providers.dart';
 import '../../shell/main_app_bar.dart';
 import '../application/my_profile_controller.dart';
 import '../data/profile_models.dart';
@@ -139,6 +140,8 @@ class MyProfileScreen extends ConsumerWidget {
                   const _ActionsRow(),
                   const SizedBox(height: 12),
                   const _AppLockCard(),
+                  const SizedBox(height: 12),
+                  const _PresenceCard(),
                   if (switch (ref.watch(authControllerProvider)) {
                     Authenticated(:final user) => user.isAdmin,
                     _ => false,
@@ -558,6 +561,54 @@ class _AppLockCard extends ConsumerWidget {
               value: lock.enabled,
               onChanged: lock.loaded
                   ? (value) => _toggle(context, ref, value)
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "En ligne" and "vu à…", shared or not (reciprocal).
+class _PresenceCard extends ConsumerWidget {
+  const _PresenceCard();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final share = ref.watch(sharePresenceProvider);
+    return SurfaceCard(
+      child: MergeSemantics(
+        child: Row(
+          children: [
+            const IconTile(Icons.visibility_outlined, tone: PillTone.basil),
+            const SizedBox(width: 12),
+            const Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Statut en ligne'),
+                  Text(
+                    'Désactivé, vous ne voyez plus non plus celui des autres',
+                  ),
+                ],
+              ),
+            ),
+            Switch(
+              value: share.value ?? true,
+              onChanged: share.hasValue
+                  ? (value) async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      try {
+                        await ref
+                            .read(sharePresenceProvider.notifier)
+                            .set(value);
+                      } on ApiException catch (error) {
+                        messenger.showSnackBar(
+                          SnackBar(content: Text(error.message)),
+                        );
+                      }
+                    }
                   : null,
             ),
           ],

@@ -20,6 +20,9 @@ class RealtimeEvent {
 abstract interface class RealtimeClient {
   Stream<RealtimeEvent> get events;
 
+  /// Fire-and-forget event to the server (`typing`). Dropped while offline.
+  void emit(String event, Map<String, dynamic> data);
+
   void dispose();
 }
 
@@ -74,7 +77,10 @@ class SocketIoRealtimeClient implements RealtimeClient {
 
   static const _forwarded = [
     'message:new',
+    'message:updated',
     'conversation:read',
+    'typing',
+    'presence',
     'notification:new',
     'connection:update',
   ];
@@ -102,6 +108,13 @@ class SocketIoRealtimeClient implements RealtimeClient {
     }
     if (reconnect && !_disposed) {
       _socket.connect();
+    }
+  }
+
+  @override
+  void emit(String event, Map<String, dynamic> data) {
+    if (_socket.connected) {
+      _socket.emit(event, data);
     }
   }
 

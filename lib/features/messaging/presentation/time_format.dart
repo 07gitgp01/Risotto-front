@@ -72,3 +72,16 @@ String dayLabel(DateTime value, {DateTime? now}) {
   }
   return '${local.day} ${months[local.month - 1]} ${local.year}';
 }
+
+/// Chat header: "Vu aujourd’hui à 14:05", "Vu hier à 09:12", "Vu le 3 mars 2026".
+String lastSeenLabel(DateTime value, {DateTime? now}) {
+  final local = value.toLocal();
+  final days = _daysAgo(local, (now ?? DateTime.now()).toLocal());
+  if (days <= 0) {
+    return 'Vu aujourd’hui à ${clockTime(local)}';
+  }
+  if (days == 1) {
+    return 'Vu hier à ${clockTime(local)}';
+  }
+  return 'Vu le ${dayLabel(local, now: now)}';
+}

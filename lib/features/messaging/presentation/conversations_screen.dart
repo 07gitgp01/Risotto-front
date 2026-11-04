@@ -13,6 +13,7 @@ import '../../shell/main_app_bar.dart';
 import '../application/messaging_providers.dart';
 import '../application/open_chat.dart';
 import '../data/messaging_models.dart';
+import 'chat_screen.dart' show OnlineDot;
 import 'time_format.dart';
 
 /// Messages tab (design: messages): search, quick access to my connections,
@@ -401,7 +402,7 @@ class _ConversationCard extends StatelessWidget {
         mine && readAt != null && !readAt.isBefore(last.createdAt);
     final preview = last == null
         ? 'Nouvelle conversation'
-        : '${mine ? 'Vous : ' : ''}${last.body}';
+        : '${mine ? 'Vous : ' : ''}${last.previewText}';
 
     return SurfaceCard(
       padding: EdgeInsets.zero,
@@ -425,11 +426,22 @@ class _ConversationCard extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(12, 14, 16, 14),
                 child: Row(
                   children: [
-                    ProfileAvatar(
-                      initials: user.initials,
-                      photoUrl: user.photoUrl,
-                      name: user.fullName,
-                      radius: 28,
+                    Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        ProfileAvatar(
+                          initials: user.initials,
+                          photoUrl: user.photoUrl,
+                          name: user.fullName,
+                          radius: 28,
+                        ),
+                        if (conversation.presence?.online ?? false)
+                          const Positioned(
+                            right: 0,
+                            bottom: 0,
+                            child: OnlineDot(),
+                          ),
+                      ],
                     ),
                     const SizedBox(width: 12),
                     Expanded(
